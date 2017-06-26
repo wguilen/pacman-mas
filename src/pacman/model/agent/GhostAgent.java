@@ -1,7 +1,6 @@
 package pacman.model.agent;
 
 import jade.core.Agent;
-import pacman.model.behaviour.GhostLeaveHouseBehaviour;
 import pacman.model.behaviour.GhostLifecycleBehaviour;
 import pacman.model.behaviour.GhostMovementBehaviour;
 import pacman.model.board.Board;
@@ -32,9 +31,8 @@ public class GhostAgent extends Agent
         houseLeft = false;
         
         // Adds its behaviour
-        addBehaviour(new GhostLifecycleBehaviour());
-        addBehaviour(new GhostLeaveHouseBehaviour(this, board, myCell));
-        addBehaviour(new GhostMovementBehaviour(this, board, myCell));
+        addBehaviour(new GhostLifecycleBehaviour(this, board, myCell)); // CyclicBehaviour
+        addBehaviour(new GhostMovementBehaviour(this, board, myCell));  // TickerBehaviour
     }
 
     
