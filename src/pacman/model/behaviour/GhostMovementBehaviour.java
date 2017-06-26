@@ -62,9 +62,15 @@ public class GhostMovementBehaviour extends TickerBehaviour
         Coord2D myPosition = myCell.getPosition();
         Coord2D myNewPosition = null;
         Cell nearCell;
+        
+        // Control variable used for letting the ghost reverse his way, 
+        //      if it gets stuck
+        int attemps = 0; 
 
         do 
         {
+            ++attemps;
+            
             // If no direction is being followed, selects one
             if (null == currentDirection)
             {
@@ -75,7 +81,7 @@ public class GhostMovementBehaviour extends TickerBehaviour
                     nearCell = board.getCell(myNewPosition);
 
                     // If it's a valid cell and the direction is not a reverse one, selects it
-                    if (isValidDestination(nearCell) && lastDirection != direction)
+                    if (isValidDestination(nearCell) && (lastDirection != direction || attemps >= 3))
                     {
                         cellSelected = true;
                         currentDirection = direction;
