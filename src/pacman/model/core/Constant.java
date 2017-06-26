@@ -10,10 +10,10 @@ public class Constant
     public static final int BOARD_CELL_SIZE                     = 30;   // Squarred size of each cell in the GUI
     
     // Entities general
-    public static final int MOVEMENT_DELAY                      = 500; // Delay (in milliseconds) for each movement from ghosts and pacman
+    public static final int MOVEMENT_DELAY                      = 300; // Delay (in milliseconds) for each movement from ghosts and pacman
     
     // Ghosts
     public static final int GHOST_LEAVE_HOUSE_DELAY             = 3000; // Delay (in milliseconds) for each ghost leaving the house
-    public static final float GHOST_TURN_ON_BIFURCATION_CHANCE  = 0.3f;
+    public static final float GHOST_TURN_ON_BIFURCATION_CHANCE  = 0.3f; // Chance of ghost to turn on bifurcation when one is found in his continous path
     
 }

@@ -6,6 +6,7 @@ import jade.lang.acl.ACLMessage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import pacman.model.agent.GhostAgent;
 import pacman.model.board.Board;
 import pacman.model.board.Cell;
@@ -108,17 +109,14 @@ public class GhostMovementBehaviour extends TickerBehaviour
                     // Found a valid bifurcation
                     if (isValidDestination(nearCell))
                     {
-                        boolean changeDirection = new Random().nextBoolean();
+                        float changeDirection = ThreadLocalRandom.current().nextFloat();
                         
                         // May I follow it?
-                        if (changeDirection)
+                        if (changeDirection <= Constant.GHOST_TURN_ON_BIFURCATION_CHANCE)
                         {
                             cellSelected = true;
                             currentDirection = direction;
                             lastDirection = currentDirection.getReverse();
-                            
-                            //System.out.println("Changing direction");
-                            
                             break;
                         }
                     }
