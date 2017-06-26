@@ -2,6 +2,9 @@ package pacman.model.behaviour;
 
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
+import jade.lang.acl.ACLMessage;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import pacman.model.agent.GhostAgent;
 import pacman.model.board.Board;
@@ -9,7 +12,9 @@ import pacman.model.board.Cell;
 import pacman.model.board.CellType;
 import pacman.model.board.Coord2D;
 import pacman.model.board.Direction;
+import pacman.model.board.GhostCell;
 import pacman.model.core.Constant;
+import pacman.model.core.GhostVocabulary;
 
 public class GhostMovementBehaviour extends TickerBehaviour
 {
@@ -106,7 +111,7 @@ public class GhostMovementBehaviour extends TickerBehaviour
                             currentDirection = direction;
                             lastDirection = currentDirection.getReverse();
                             
-                            System.out.println("Changing direction");
+                            //System.out.println("Changing direction");
                             
                             break;
                         }
@@ -138,7 +143,54 @@ public class GhostMovementBehaviour extends TickerBehaviour
     
     private void checkGhostOnSamePath()
     {
+        // TODO: Continue from here...
+        List<GhostAgent> ghosts = new ArrayList<>();
         
+        // Checks the row (from my position to the beggining of the board)
+        for (int i = myCell.getPosition().x; i > 0; --i)
+        {
+            Cell cell = board.getCell(new Coord2D(i, myCell.getPosition().y));
+            
+            if (!isValidDestination(cell))
+            {
+                break;
+            }
+            
+            if (cell.getType().equals(CellType.GHOST))
+            {
+                ghosts.add(((GhostCell) cell).getAgent());
+            }
+        }
+        
+        // Checks the row (from my position to the end of the board)
+        for (int i = myCell.getPosition().x; i < board.countRows(); ++i)
+        {
+            Cell cell = board.getCell(new Coord2D(i, myCell.getPosition().y));
+            
+            if (!isValidDestination(cell))
+            {
+                break;
+            }
+            
+            if (cell.getType().equals(CellType.GHOST))
+            {
+                ghosts.add(((GhostCell) cell).getAgent());
+            }
+        }
+        
+        if (!ghosts.isEmpty())
+        {
+            ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
+            message.setOntology(GhostVocabulary.ONTOLOGY);
+            message.setContent(GhostVocabulary.GET_OUT_OF_MY_WAY);
+            
+            ghosts.forEach((ghost) ->
+            {
+                message.addReceiver(ghost.getAID());
+            });
+            
+            myAgent.send(message);
+        }
     }
     
     private boolean isValidDestination(Cell cell)

@@ -8,6 +8,7 @@ public class GhostVocabulary
     
     // --- Vocabulary
     
-    public static final String LEAVE_THE_HOUSE  = "LEAVE_THE_HOUSE";
-
+    public static final String LEAVE_THE_HOUSE      = "LEAVE_THE_HOUSE";
+    public static final String GET_OUT_OF_MY_WAY    = "GET_OUT_OF_MY_WAY";
+    
 }
