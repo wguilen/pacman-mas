@@ -103,12 +103,18 @@ public class GhostLeaveHouseBehaviour extends CyclicBehaviour
             
             // Advices the next ghost (if any) to leave his house
             adviceNextGhost();
+            
+            // Delays a time before the first ghost leaves the door
+            try { Thread.sleep(Constant.MOVEMENT_DELAY); } catch (InterruptedException ex) {}
         }
     }
     
     @SuppressWarnings("SleepWhileInLoop")
     private void nextGhostToLeave()
     {
+        // Delays a time and starts to move
+        try { Thread.sleep(Constant.GHOST_LEAVE_HOUSE_DELAY); } catch (InterruptedException ex) {}
+                    
         Coord2D doorPosition = board.getGhostDoor().getPosition();
         Direction lastDirection = null;
         
@@ -131,26 +137,31 @@ public class GhostLeaveHouseBehaviour extends CyclicBehaviour
                     // Advices the next ghost (if any) to leave his house
                     adviceNextGhost();
                     
+                    // Delays a time before the next ghost leaves the door
+                    try { Thread.sleep(Constant.MOVEMENT_DELAY); } catch (InterruptedException ex) {}
+            
                     break;
                 }
-
                 // Else, keeps looking for it
-                Cell nearCell = board.getCell(myNewPosition);
-                if (CellType.GHOST_HOUSE == nearCell.getType())
+                else
                 {
-                    if (null == lastDirection)
+                    Cell nearCell = board.getCell(myNewPosition);
+                    if (CellType.GHOST_HOUSE == nearCell.getType())
                     {
-                        lastDirection = direction;
-                    }
-                    
-                    if (lastDirection == direction)
-                    {
-                        System.out.println(myAgent.getLocalName() + " is moving to " + direction);   
-                        board.moveCell(myCell, myNewPosition);
-                        board.print();    
-                        
-                        // Delays a time after the ghost makes its movement
-                        try { Thread.sleep(Constant.MOVEMENT_DELAY); } catch (InterruptedException ex) {}
+                        if (null == lastDirection)
+                        {
+                            lastDirection = direction;
+                        }
+
+                        if (lastDirection == direction)
+                        {
+                            System.out.println(myAgent.getLocalName() + " is moving to " + direction);   
+                            board.moveCell(myCell, myNewPosition);
+                            board.print();    
+
+                            // Delays a time after the ghost makes its movement
+                            try { Thread.sleep(Constant.MOVEMENT_DELAY); } catch (InterruptedException ex) {}
+                        }
                     }
                 }
             }
@@ -171,9 +182,6 @@ public class GhostLeaveHouseBehaviour extends CyclicBehaviour
                 Cell nearCell = board.getCell(new Coord2D(position.x + direction.xInc, position.y + direction.yInc));
                 if (nearCell.getType() == CellType.GHOST_HOUSE)
                 {
-                    // Delays a time and advices the next ghost
-                    try { Thread.sleep(Constant.GHOST_LEAVE_HOUSE_DELAY); } catch (InterruptedException ex) {}
-                    
                     // Mounts the message and sends it to the next ghost to leave the house
                     ACLMessage nextGhostMessage = new ACLMessage(ACLMessage.INFORM);
                     nextGhostMessage.setOntology(GhostVocabulary.ONTOLOGY);
