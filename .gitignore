@@ -1,0 +1,14 @@
+# Files
+APDescription.txt
+MTPs-Pacman.txt
+MTPs-Main-Container.txt
+SMA.txt
+
+# Directories
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+test/
+.nb-gradle/
