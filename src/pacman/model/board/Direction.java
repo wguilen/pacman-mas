@@ -19,7 +19,7 @@ public enum Direction
     
     public Direction getReverse()
     {
-        Direction reverse = null;
+        Direction reverse = Direction.NONE;
         
         switch (this)
         {

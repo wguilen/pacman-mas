@@ -2,6 +2,7 @@ package pacman.model.behaviour;
 
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
+import java.util.Random;
 import pacman.model.agent.GhostAgent;
 import pacman.model.board.Board;
 import pacman.model.board.Cell;
@@ -47,7 +48,7 @@ public class GhostMovementBehaviour extends TickerBehaviour
         
         Coord2D myPosition = myCell.getPosition();
         Coord2D myNewPosition = null;
-        Cell nearCell = null;
+        Cell nearCell;
 
         do 
         {
@@ -73,20 +74,57 @@ public class GhostMovementBehaviour extends TickerBehaviour
             // Tries to keep following this direction
             else
             {
-                myNewPosition = new Coord2D(myPosition.x + currentDirection.xInc, myPosition.y + currentDirection.yInc);
-                nearCell = board.getCell(myNewPosition);
-                
-                if (!isValidDestination(nearCell))
+                // If a bifurcation was found, decides to follow it or not
+                for (Direction direction : Direction.values())
                 {
-                    currentDirection = null;
+                    if (direction.equals(currentDirection) 
+                            || direction.equals(lastDirection))
+                    {
+                        continue;
+                    }
+                    
+                    myNewPosition = new Coord2D(myPosition.x + direction.xInc, myPosition.y + direction.yInc);
+                    nearCell = board.getCell(myNewPosition);
+                    
+                    // Found a valid bifurcation
+                    if (isValidDestination(nearCell))
+                    {
+                        boolean changeDirection = new Random().nextBoolean();
+                        
+                        // May I follow it?
+                        if (changeDirection)
+                        {
+                            cellSelected = true;
+                            currentDirection = direction;
+                            lastDirection = currentDirection.getReverse();
+                            
+                            System.out.println("Changing direction");
+                            
+                            break;
+                        }
+                    }
                 }
-                else
+                
+                // Else, tries to keep following the previous direction
+                if (!cellSelected)
                 {
-                    cellSelected = true;
+                    myNewPosition = new Coord2D(myPosition.x + currentDirection.xInc, myPosition.y + currentDirection.yInc);
+                    nearCell = board.getCell(myNewPosition);
+
+                    // If the direction being followed is no longer valid, selects another
+                    if (!isValidDestination(nearCell))
+                    {
+                        currentDirection = null;
+                    }
+                    else
+                    {
+                        cellSelected = true;
+                    }
                 }
             }
         } while (!cellSelected);
         
+        // Effectively makes the movement
         board.moveCell(myCell, myNewPosition);
     }
     
