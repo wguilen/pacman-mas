@@ -61,29 +61,11 @@ public class GhostMovementBehaviour extends TickerBehaviour
                     nearCell = board.getCell(myNewPosition);
 
                     // If it's a valid cell and the direction is not a reverse one, selects it
-                    if (isValidCell(nearCell) && lastDirection != direction)
+                    if (isValidDestination(nearCell) && lastDirection != direction)
                     {
                         cellSelected = true;
                         currentDirection = direction;
-                        switch (currentDirection)
-                        {
-                            case DOWN:
-                                lastDirection = Direction.UP;
-                                break;
-                            
-                            case UP:
-                                lastDirection = Direction.DOWN;
-                                break;
-                                
-                            case LEFT:
-                                lastDirection = Direction.RIGHT;
-                                break;
-                                
-                            case RIGHT:
-                                lastDirection = Direction.LEFT;
-                                break;
-                        }
-                        
+                        lastDirection = currentDirection.getReverse();
                         break;
                     }
                 }
@@ -94,7 +76,7 @@ public class GhostMovementBehaviour extends TickerBehaviour
                 myNewPosition = new Coord2D(myPosition.x + currentDirection.xInc, myPosition.y + currentDirection.yInc);
                 nearCell = board.getCell(myNewPosition);
                 
-                if (!isValidCell(nearCell))
+                if (!isValidDestination(nearCell))
                 {
                     currentDirection = null;
                 }
@@ -108,7 +90,7 @@ public class GhostMovementBehaviour extends TickerBehaviour
         board.moveCell(myCell, myNewPosition);
     }
     
-    private boolean isValidCell(Cell cell)
+    private boolean isValidDestination(Cell cell)
     {
         return CellType.DOOR != cell.getType()             // Cannot run to a door
                && CellType.GHOST_HOUSE != cell.getType()   // Neither to a ghost house
