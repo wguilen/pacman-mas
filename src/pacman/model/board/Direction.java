@@ -16,5 +16,31 @@ public enum Direction
         this.yInc = yInc;
         this.xInc = xInc;
     }
+    
+    public Direction getReverse()
+    {
+        Direction reverse = Direction.NONE;
+        
+        switch (this)
+        {
+            case DOWN:
+                reverse = Direction.UP;
+                break;
+
+            case UP:
+                reverse = Direction.DOWN;
+                break;
+
+            case LEFT:
+                reverse = Direction.RIGHT;
+                break;
+
+            case RIGHT:
+                reverse = Direction.LEFT;
+                break;
+        }
+        
+        return reverse;
+    }
 
 }

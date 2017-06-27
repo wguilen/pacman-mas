@@ -10,7 +10,7 @@ public class GameGuiBehaviour extends TickerBehaviour
 
     public GameGuiBehaviour(Agent agent)
     {
-        super(agent, Constant.MOVEMENT_DELAY / 4);
+        super(agent, Constant.MOVEMENT_DELAY);
     }
 
     @Override
