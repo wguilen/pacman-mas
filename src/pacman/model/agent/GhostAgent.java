@@ -5,6 +5,7 @@ import pacman.model.behaviour.GhostLifecycleBehaviour;
 import pacman.model.behaviour.GhostMovementBehaviour;
 import pacman.model.board.Board;
 import pacman.model.board.Cell;
+import pacman.model.board.Direction;
 import pacman.model.board.GhostCell;
 
 public class GhostAgent extends Agent
@@ -15,6 +16,9 @@ public class GhostAgent extends Agent
     
     // Game control properties
     private boolean houseLeft;
+    private boolean gameRunning; // TODO: Quando o Pacman for morto, setar o gameRunning = true (pegar o gameRunning do agente que, por sua vez, receberá do GameAgent através de mensagem)
+    private Direction currentDirection;
+    private Direction lastDirection;
     
     @Override
     protected void setup()
@@ -29,6 +33,8 @@ public class GhostAgent extends Agent
         
         // Inits the control properties
         houseLeft = false;
+        gameRunning = true; // TODO: Change this
+        currentDirection = lastDirection = null;
         
         // Adds its behaviour
         addBehaviour(new GhostLifecycleBehaviour(this, board, myCell)); // CyclicBehaviour
@@ -51,6 +57,36 @@ public class GhostAgent extends Agent
     public void setHouseLeft(boolean houseLeft)
     {
         this.houseLeft = houseLeft;
+    }
+
+    public boolean isGameRunning()
+    {
+        return gameRunning;
+    }
+
+    public void setGameRunning(boolean gameRunning)
+    {
+        this.gameRunning = gameRunning;
+    }
+
+    public Direction getCurrentDirection()
+    {
+        return currentDirection;
+    }
+
+    public void setCurrentDirection(Direction currentDirection)
+    {
+        this.currentDirection = currentDirection;
+    }
+
+    public Direction getLastDirection()
+    {
+        return lastDirection;
+    }
+
+    public void setLastDirection(Direction lastDirection)
+    {
+        this.lastDirection = lastDirection;
     }
     
     

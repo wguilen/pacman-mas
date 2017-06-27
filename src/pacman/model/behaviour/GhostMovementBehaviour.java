@@ -5,7 +5,6 @@ import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import pacman.model.agent.GhostAgent;
 import pacman.model.board.Board;
@@ -22,11 +21,6 @@ public class GhostMovementBehaviour extends TickerBehaviour
 
     protected final Board board;
     protected final Cell myCell;
-    
-    // Control properties
-    protected final boolean gameRunning; // TODO: Quando o Pacman for morto, setar o gameRunning = true (pegar o gameRunning do agente que, por sua vez, receberá do GameAgent através de mensagem)
-    private Direction currentDirection;
-    private Direction lastDirection;
 
     public GhostMovementBehaviour(Agent agent, Board board, Cell myCell)
     {
@@ -34,19 +28,15 @@ public class GhostMovementBehaviour extends TickerBehaviour
         
         this.board = board;
         this.myCell = myCell;
-        
-        // Inits the control properties
-        currentDirection = lastDirection = null;
-        gameRunning = true; // TODO: Change this
     }
-    
     
     @Override
     public void onTick()
     {
         // If the game is not running or the ghost still didn't 
         //      left his house, doesn't move
-        if (!(gameRunning && ((GhostAgent) myAgent).isHouseLeft()))
+        if (!(((GhostAgent)myAgent).isGameRunning() 
+                && ((GhostAgent) myAgent).isHouseLeft()))
         {
             //System.out.println(myAgent.getLocalName() + " still didn't left his house...");
             return;
@@ -73,7 +63,7 @@ public class GhostMovementBehaviour extends TickerBehaviour
             ++attemps;
             
             // If no direction is being followed, selects one
-            if (null == currentDirection)
+            if (null == getCurrentDirection())
             {
                 // Selects a direction to follow
                 for (Direction direction : Direction.values())
@@ -82,11 +72,11 @@ public class GhostMovementBehaviour extends TickerBehaviour
                     nearCell = board.getCell(myNewPosition);
 
                     // If it's a valid cell and the direction is not a reverse one, selects it
-                    if (isValidDestination(nearCell) && (lastDirection != direction || attemps >= 3))
+                    if (isValidDestination(nearCell) && (getLastDirection() != direction || attemps >= 3))
                     {
                         cellSelected = true;
-                        currentDirection = direction;
-                        lastDirection = currentDirection.getReverse();
+                        setCurrentDirection(direction);
+                        setLastDirection(direction.getReverse());
                         break;
                     }
                 }
@@ -97,8 +87,8 @@ public class GhostMovementBehaviour extends TickerBehaviour
                 // If a bifurcation was found, decides to follow it or not
                 for (Direction direction : Direction.values())
                 {
-                    if (direction.equals(currentDirection) 
-                            || direction.equals(lastDirection))
+                    if (direction.equals(getCurrentDirection()) 
+                            || direction.equals(getLastDirection()))
                     {
                         continue;
                     }
@@ -115,8 +105,8 @@ public class GhostMovementBehaviour extends TickerBehaviour
                         if (changeDirection <= Constant.GHOST_TURN_ON_BIFURCATION_CHANCE)
                         {
                             cellSelected = true;
-                            currentDirection = direction;
-                            lastDirection = currentDirection.getReverse();
+                            setCurrentDirection(direction);
+                            setLastDirection(direction.getReverse());
                             break;
                         }
                     }
@@ -125,13 +115,13 @@ public class GhostMovementBehaviour extends TickerBehaviour
                 // Else, tries to keep following the previous direction
                 if (!cellSelected)
                 {
-                    myNewPosition = getNewPosition(myPosition, currentDirection);
+                    myNewPosition = getNewPosition(myPosition, getCurrentDirection());
                     nearCell = board.getCell(myNewPosition);
 
                     // If the direction being followed is no longer valid, selects another
                     if (!isValidDestination(nearCell))
                     {
-                        currentDirection = null;
+                        setCurrentDirection(null);
                     }
                     else
                     {
@@ -147,41 +137,53 @@ public class GhostMovementBehaviour extends TickerBehaviour
     
     private void checkGhostOnSamePath()
     {
-        // TODO: Continue from here...
         List<GhostAgent> ghosts = new ArrayList<>();
         
-        // Checks the row (from my position to the beggining of the board)
-        for (int i = myCell.getPosition().x; i > 0; --i)
+        // Checks if there's another ghost in the same column as me
+        // (from my position to the beggining of the board)
+        for (int i = getNewPosition(myCell.getPosition(), Direction.UP).x; i > 0; --i)
         {
             Cell cell = board.getCell(new Coord2D(i, myCell.getPosition().y));
-            
-            if (!isValidDestination(cell))
+            if (!addGhostOnSamePath(ghosts, cell))
             {
                 break;
             }
-            
-            if (cell.getType().equals(CellType.GHOST))
-            {
-                ghosts.add(((GhostCell) cell).getAgent());
-            }
         }
         
-        // Checks the row (from my position to the end of the board)
-        for (int i = myCell.getPosition().x; i < board.countRows(); ++i)
+        // Checks if there's another ghost in the same column as me
+        // (from my position to the end of the board)
+        for (int i = getNewPosition(myCell.getPosition(), Direction.DOWN).x; i < board.countRows(); ++i)
         {
             Cell cell = board.getCell(new Coord2D(i, myCell.getPosition().y));
-            
-            if (!isValidDestination(cell))
+            if (!addGhostOnSamePath(ghosts, cell))
             {
                 break;
             }
-            
-            if (cell.getType().equals(CellType.GHOST))
+        }
+        
+        // Checks if there's another ghost in the same row as me
+        // (from my position to the beggining of the board)
+        for (int i = getNewPosition(myCell.getPosition(), Direction.LEFT).y; i > 0; --i)
+        {
+            Cell cell = board.getCell(new Coord2D(myCell.getPosition().x, i));
+            if (!addGhostOnSamePath(ghosts, cell))
             {
-                ghosts.add(((GhostCell) cell).getAgent());
+                break;
             }
         }
         
+        // Checks if there's another ghost in the same row as me
+        // (from my position to the end of the board)
+        for (int i = getNewPosition(myCell.getPosition(), Direction.RIGHT).y; i < board.countColumns(); ++i)
+        {
+            Cell cell = board.getCell(new Coord2D(myCell.getPosition().x, i));
+            if (!addGhostOnSamePath(ghosts, cell))
+            {
+                break;
+            }
+        }
+        
+        // If there was any ghost(s), notifies it(them)
         if (!ghosts.isEmpty())
         {
             ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
@@ -195,6 +197,31 @@ public class GhostMovementBehaviour extends TickerBehaviour
             
             myAgent.send(message);
         }
+    }
+    
+    private boolean addGhostOnSamePath(List<GhostAgent> ghosts, Cell cell)
+    {
+        if (cell.getType().equals(CellType.GHOST))
+        {
+            GhostAgent other = ((GhostCell) cell).getAgent();
+            
+            // If the other ghost direction is the opposite of mine,
+            //    I ask him for leaving my path
+            if (
+                    null != getCurrentDirection()
+                    && null != other.getCurrentDirection() 
+                    && getCurrentDirection().equals(other.getCurrentDirection().getReverse())
+               )
+            {
+                ghosts.add(other);
+            }
+            
+            // This is needed so the loop in which this method is called
+            //   keeps running
+            return true; 
+        }
+        
+        return isValidDestination(cell);
     }
     
     private boolean isValidDestination(Cell cell)
@@ -232,5 +259,27 @@ public class GhostMovementBehaviour extends TickerBehaviour
         return newPosition;
     }
 
+    
+    // --- Getters and setters
+    
+    private Direction getCurrentDirection()
+    {
+        return ((GhostAgent) myAgent).getCurrentDirection();
+    }
+    
+    private void setCurrentDirection(Direction direction)
+    {
+        ((GhostAgent) myAgent).setCurrentDirection(direction);
+    }
+    
+    private Direction getLastDirection()
+    {
+        return ((GhostAgent) myAgent).getLastDirection();
+    }
+    
+    private void setLastDirection(Direction direction)
+    {
+        ((GhostAgent) myAgent).setLastDirection(direction);
+    }
 }
  
