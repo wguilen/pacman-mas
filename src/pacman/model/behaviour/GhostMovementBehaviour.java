@@ -42,6 +42,13 @@ public class GhostMovementBehaviour extends TickerBehaviour
             return;
         }
         
+        // If the ghost received "GET_OUT_MY_WAY", maybe it reverses the
+        //      direction being followed
+        if (((GhostAgent) myAgent).isReverseDirection())
+        {
+            maybeReverseDirection();
+        }
+        
         move();                 // Ghost makes a movement
         checkGhostOnSamePath(); // Ghost checks if are there another ghosts on the same path
     }
@@ -210,7 +217,7 @@ public class GhostMovementBehaviour extends TickerBehaviour
             if (
                     null != getCurrentDirection()
                     && null != other.getCurrentDirection() 
-                    && getCurrentDirection().equals(other.getCurrentDirection().getReverse())
+                    && other.getCurrentDirection().equals(getCurrentDirection().getReverse())
                )
             {
                 ghosts.add(other);
@@ -259,6 +266,19 @@ public class GhostMovementBehaviour extends TickerBehaviour
         return newPosition;
     }
 
+    private void maybeReverseDirection()
+    {
+        boolean reverse = ThreadLocalRandom.current().nextBoolean();
+        if (reverse)
+        {
+            setLastDirection(getCurrentDirection());
+            setCurrentDirection(getCurrentDirection().getReverse());
+            
+            //System.out.println(myAgent.getLocalName() + " reversed his direction");
+        }
+        
+        ((GhostAgent) myAgent).setReverseDirection(false);
+    }
     
     // --- Getters and setters
     

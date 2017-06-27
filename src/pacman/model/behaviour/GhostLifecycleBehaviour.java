@@ -3,6 +3,7 @@ package pacman.model.behaviour;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
+import pacman.model.agent.GhostAgent;
 import pacman.model.board.Board;
 import pacman.model.board.Cell;
 import pacman.model.core.GameVocabulary;
@@ -52,7 +53,7 @@ public class GhostLifecycleBehaviour extends CyclicBehaviour
                             break;
                             
                         case GhostVocabulary.GET_OUT_OF_MY_WAY:
-                            // TODO: Implement
+                            ((GhostAgent) myAgent).setReverseDirection(true);
                             break;
                             
                         default:

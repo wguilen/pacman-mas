@@ -15,10 +15,11 @@ public class GhostAgent extends Agent
     private Cell myCell;
     
     // Game control properties
-    private boolean houseLeft;
-    private boolean gameRunning; // TODO: Quando o Pacman for morto, setar o gameRunning = true (pegar o gameRunning do agente que, por sua vez, receberá do GameAgent através de mensagem)
-    private Direction currentDirection;
-    private Direction lastDirection;
+    private boolean houseLeft;              // TRUE when the ghost has left his house - FALSE otherwise
+    private boolean gameRunning;            // TODO: Quando o Pacman for morto, setar o gameRunning = true (pegar o gameRunning do agente que, por sua vez, receberá do GameAgent através de mensagem)
+    private Direction currentDirection;     // Tracks the current direction being followed by the ghost
+    private Direction lastDirection;        // Tracks the last direction followed by the ghost (actually, it's currentDirection.getReverse())
+    private boolean reverseDirection;       // TRUE if ghost receives "GET_OUT_OF_MY_WAY" from another ghost - FALSE otherwise
     
     @Override
     protected void setup()
@@ -34,6 +35,7 @@ public class GhostAgent extends Agent
         // Inits the control properties
         houseLeft = false;
         gameRunning = true; // TODO: Change this
+        reverseDirection = false;
         currentDirection = lastDirection = null;
         
         // Adds its behaviour
@@ -87,6 +89,16 @@ public class GhostAgent extends Agent
     public void setLastDirection(Direction lastDirection)
     {
         this.lastDirection = lastDirection;
+    }
+
+    public boolean isReverseDirection()
+    {
+        return reverseDirection;
+    }
+
+    public void setReverseDirection(boolean reverseDirection)
+    {
+        this.reverseDirection = reverseDirection;
     }
     
     
