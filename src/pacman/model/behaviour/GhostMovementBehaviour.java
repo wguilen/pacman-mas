@@ -29,6 +29,14 @@ public class GhostMovementBehaviour extends TickerBehaviour
         this.board = board;
         this.myCell = myCell;
     }
+
+    @Override
+    public void onStart()
+    {
+        // Delays a time before starts moving
+        try { Thread.sleep(Constant.GHOST_LEAVE_HOUSE_DELAY); } catch (InterruptedException ex) {}
+    }
+    
     
     @Override
     public void onTick()

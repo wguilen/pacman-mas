@@ -1,6 +1,7 @@
 package pacman.model.behaviour;
 
-import jade.core.behaviours.OneShotBehaviour;
+import jade.core.Agent;
+import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,22 +11,23 @@ import pacman.model.board.Cell;
 import pacman.model.board.CellType;
 import pacman.model.board.Coord2D;
 import pacman.model.board.Direction;
+import pacman.model.core.Constant;
 import pacman.model.core.GhostVocabulary;
 
-public abstract class GhostLeaveHouseBehaviour extends OneShotBehaviour
+public abstract class GhostLeaveHouseBehaviour extends TickerBehaviour
 {
 
     protected  final Board board;
     protected  final Cell myCell;
 
-    public GhostLeaveHouseBehaviour(Board board, Cell cell)
+    public GhostLeaveHouseBehaviour(Agent agent, Board board, Cell cell)
     {
-        //super(agent);
+        super(agent, Constant.MOVEMENT_DELAY);
+        
         this.board = board;
         this.myCell = cell;
     }
     
-    @SuppressWarnings("SleepWhileInLoop")
     protected void adviceNextGhost()
     {
         // Selects the next ghost (if any) to leave the house and sends it a message

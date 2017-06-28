@@ -1,5 +1,6 @@
 package pacman.model.behaviour;
 
+import jade.core.Agent;
 import pacman.model.agent.GhostAgent;
 import pacman.model.board.Board;
 import pacman.model.board.Cell;
@@ -9,18 +10,15 @@ import pacman.model.core.Constant;
 
 public class GhostLeaveHouseFirstBehaviour extends GhostLeaveHouseBehaviour
 {
-    
-    public GhostLeaveHouseFirstBehaviour(Board board, Cell myCell)
-    {
-        super(board, myCell);
-    }
 
-    @Override
-    public void action()
+    public GhostLeaveHouseFirstBehaviour(Agent agent, Board board, Cell cell)
     {
-        // Delays a time before the first ghost leaves his house
-        try { Thread.sleep(Constant.MOVEMENT_DELAY); } catch (InterruptedException ex) {}
-                        
+        super(agent, board, cell);
+    }
+    
+    @Override
+    public void onTick()
+    {
         // Tries to leave the house
         Coord2D doorPosition = board.getGhostDoor().getPosition();
         Coord2D myNewPosition = null;
@@ -51,6 +49,8 @@ public class GhostLeaveHouseFirstBehaviour extends GhostLeaveHouseBehaviour
             // Delays a time before the first ghost leaves the door
             try { Thread.sleep(Constant.MOVEMENT_DELAY); } catch (InterruptedException ex) {}
         }
+        
+        myAgent.removeBehaviour(this); // Removes this behaviour from me and the other ghosts
     }
     
 }
