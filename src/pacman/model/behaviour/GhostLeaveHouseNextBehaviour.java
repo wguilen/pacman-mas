@@ -74,6 +74,8 @@ public class GhostLeaveHouseNextBehaviour extends GhostLeaveHouseBehaviour
                 }
             }
         } while (!((GhostAgent) myAgent).isHouseLeft());
+        
+        myAgent.removeBehaviour(this);
     }
     
 }

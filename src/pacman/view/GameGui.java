@@ -1,5 +1,7 @@
 package pacman.view;
 
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.io.IOException;
 import javax.imageio.ImageIO;
@@ -20,6 +22,7 @@ public class GameGui extends JFrame implements GameListener
         this.boardGui = new BoardGui(agent.getBoard());
         
         init();
+        initListeners();
     }
     
     private void init()
@@ -27,6 +30,7 @@ public class GameGui extends JFrame implements GameListener
         setResizable(false);
         setSize(boardGui.getSize());
         setTitle("Multiagent Pacman");
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
         
         // Tries to set the app icon
         try
@@ -35,10 +39,15 @@ public class GameGui extends JFrame implements GameListener
         } 
         catch (IOException ex) {}
         
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        
+        add(boardGui);
+        setVisible(true);
+    }
+    
+    private void initListeners()
+    {
         addWindowListener(new WindowAdapter()
         {
+            
             @Override
             public void windowClosing(java.awt.event.WindowEvent e)
             {
@@ -47,8 +56,19 @@ public class GameGui extends JFrame implements GameListener
             
         });
         
-        add(boardGui);
-        setVisible(true);
+        addKeyListener(new KeyAdapter()
+        {
+            
+            @Override
+            public void keyReleased(KeyEvent e)
+            {
+                if (KeyEvent.VK_SPACE == e.getKeyCode())
+                {
+                    myAgent.togglePause();
+                }
+            }
+            
+        });
     }
 
     
