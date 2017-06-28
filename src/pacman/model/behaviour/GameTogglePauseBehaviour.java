@@ -1,34 +1,25 @@
 package pacman.model.behaviour;
 
 import jade.core.AID;
-import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.wrapper.StaleProxyException;
 import pacman.model.agent.GameAgent;
-import pacman.model.board.Board;
 import pacman.model.core.GameVocabulary;
 
-public class GameStartBehaviour extends OneShotBehaviour
+public class GameTogglePauseBehaviour extends OneShotBehaviour
 {
-
-    private final Board board;
-
-    public GameStartBehaviour(Agent agent, Board board)
-    {
-        super(agent);
-        this.board = board;
-    }
+    
     
     @Override
     public void action()
     {
-        System.out.println("On GameStartBehaviour action()...");
+        boolean pause = ((GameAgent) myAgent).isGameRunning();
         
-        // Tells the agents the game is about to start
+        // Tells the agents the game has to pause/continue
         ACLMessage message = new ACLMessage(ACLMessage.INFORM);
         message.setOntology(GameVocabulary.ONTOLOGY);
-        message.setContent(GameVocabulary.START);
+        message.setContent(pause ? GameVocabulary.PAUSE : GameVocabulary.CONTINUE);
 
         // Informs the ghosts...
         ((GameAgent) myAgent).getGhosts().forEach((ghost) ->
@@ -41,13 +32,14 @@ public class GameStartBehaviour extends OneShotBehaviour
         });
         
         // Informs Pacman...
-        // TODO: Implement
+        // TODO
         
         // Sends the message
         myAgent.send(message);
         
         // Updates the GameAgent state
-        ((GameAgent) myAgent).setGameRunning(true);
+        ((GameAgent) myAgent).setGameRunning(!pause);
+        myAgent.removeBehaviour(this);
     }
-
+    
 }

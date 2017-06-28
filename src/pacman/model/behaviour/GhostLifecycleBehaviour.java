@@ -36,7 +36,15 @@ public class GhostLifecycleBehaviour extends CyclicBehaviour
                     switch (message.getContent())
                     {
                         case GameVocabulary.START:
-                            myAgent.addBehaviour(new GhostLeaveHouseFirstBehaviour(board, myCell));
+                            myAgent.addBehaviour(new GhostLeaveHouseFirstBehaviour(myAgent, board, myCell));
+                            break;
+                            
+                        case GameVocabulary.PAUSE:
+                            ((GhostAgent) myAgent).setGameRunning(false);
+                            break;
+                            
+                        case GameVocabulary.CONTINUE:
+                            ((GhostAgent) myAgent).setGameRunning(true);
                             break;
                             
                         default:
@@ -49,7 +57,7 @@ public class GhostLifecycleBehaviour extends CyclicBehaviour
                     switch (message.getContent())
                     {
                         case GhostVocabulary.LEAVE_THE_HOUSE:
-                            myAgent.addBehaviour(new GhostLeaveHouseNextBehaviour(board, myCell));
+                            myAgent.addBehaviour(new GhostLeaveHouseNextBehaviour(myAgent, board, myCell));
                             break;
                             
                         case GhostVocabulary.GET_OUT_OF_MY_WAY:

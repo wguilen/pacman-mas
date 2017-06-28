@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import pacman.model.behaviour.GameLoadBehaviour;
 import pacman.model.behaviour.GameGuiBehaviour;
 import pacman.model.behaviour.GameStartBehaviour;
+import pacman.model.behaviour.GameTogglePauseBehaviour;
 import pacman.model.board.Board;
 import pacman.model.observer.GameListener;
 import pacman.view.GameGui;
@@ -27,6 +28,8 @@ public class GameAgent extends Agent
     // Observers
     private final List<GameListener> observers;
     
+    // Game control properties
+    private boolean gameRunning;    // TRUE if the game has already started and is running - FALSE otherwise
     
     // --- Ctors
 
@@ -34,6 +37,9 @@ public class GameAgent extends Agent
     {
         ghosts = new ArrayList<>();
         observers = new ArrayList<>();
+        
+        // Inits game control properties
+        gameRunning = false;
     }
     
     
@@ -62,6 +68,11 @@ public class GameAgent extends Agent
     {
         addBehaviour(new GameGuiBehaviour(this));
         addBehaviour(new GameStartBehaviour(this, board));
+    }
+    
+    public void togglePause()
+    {
+        addBehaviour(new GameTogglePauseBehaviour());
     }
     
     
@@ -103,6 +114,16 @@ public class GameAgent extends Agent
         return myGui;
     }
 
+    public void setGameRunning(boolean gameRunning)
+    {
+        this.gameRunning = gameRunning;
+    }
+
+    public boolean isGameRunning()
+    {
+        return gameRunning;
+    }
+    
     public void addObserver(GameListener observer)
     {
         if (!observers.contains(observer))

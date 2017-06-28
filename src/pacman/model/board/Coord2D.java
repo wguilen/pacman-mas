@@ -18,4 +18,10 @@ public class Coord2D
                (this == other || (this.x == other.x && this.y == other.y));
     }
     
+    @Override
+    public String toString()
+    {
+        return "{ x = " + x + ", y = " + y + " }";
+    }
+    
 }
