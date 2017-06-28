@@ -1,6 +1,8 @@
 package pacman.view;
 
 import java.awt.event.WindowAdapter;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import pacman.model.agent.GameAgent;
 import pacman.view.component.BoardGui;
@@ -24,6 +26,14 @@ public class GameGui extends JFrame
         setResizable(false);
         setSize(boardGui.getSize());
         setTitle("Multiagent Pacman");
+        
+        // Tries to set the app icon
+        try
+        {
+            setIconImage(ImageIO.read(getClass().getResource("/pacman/resources/image/icon/app.png")));
+        } 
+        catch (IOException ex) {}
+        
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         
         addWindowListener(new WindowAdapter()
