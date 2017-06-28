@@ -5,9 +5,10 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import pacman.model.agent.GameAgent;
+import pacman.model.observer.GameListener;
 import pacman.view.component.BoardGui;
 
-public class GameGui extends JFrame
+public class GameGui extends JFrame implements GameListener
 {
     
     private final GameAgent myAgent;
@@ -48,15 +49,25 @@ public class GameGui extends JFrame
         
         add(boardGui);
         setVisible(true);
-        
-        myAgent.startGame();
     }
 
+    
+    // --- Component
+    
     @Override
     public void repaint()
     {
         boardGui.repaint();
         super.repaint();
+    }
+
+    
+    // --- GameListener
+    
+    @Override
+    public void onLoaded()
+    {
+        myAgent.startGame();
     }
 
 }

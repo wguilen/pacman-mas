@@ -2,6 +2,7 @@ package pacman.model.behaviour;
 
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
+import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
 import java.io.FileNotFoundException;
 import pacman.core.ContainerManager;
@@ -48,11 +49,12 @@ public class GameLoadBehaviour extends OneShotBehaviour
 
     private void loadGhosts() throws StaleProxyException
     {
-        int ghost = 1;
+        int ghostInstance = 1;
         for (Cell freeGhostsHouse : board.getFreeGhostsHouses())
         {
             Object[] args = { board, freeGhostsHouse };
-            containerManager.instantiateAgent("Ghost-" + ghost++, GhostAgent.class.getName(), args);
+            AgentController ghost = containerManager.instantiateAgent("Ghost-" + ghostInstance++, GhostAgent.class.getName(), args);
+            ((GameAgent) myAgent).addGhost(ghost);
         }
     }   
     
@@ -82,6 +84,9 @@ public class GameLoadBehaviour extends OneShotBehaviour
                 System.out.println("Fully loaded initial board:");
                 board.print();
             }
+            
+            // Notifies the observers
+            ((GameAgent) myAgent).getObservers().forEach(observer -> observer.onLoaded());
         } 
         catch (StaleProxyException ex)
         {

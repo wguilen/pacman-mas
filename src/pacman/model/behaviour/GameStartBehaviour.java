@@ -1,8 +1,11 @@
 package pacman.model.behaviour;
 
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
+import jade.wrapper.StaleProxyException;
+import pacman.model.agent.GameAgent;
 import pacman.model.board.Board;
 import pacman.model.core.GameVocabulary;
 
@@ -28,9 +31,13 @@ public class GameStartBehaviour extends OneShotBehaviour
         message.setContent(GameVocabulary.START);
 
         // Informs the ghosts...
-        board.getGhosts().forEach((ghost) ->
+        ((GameAgent) myAgent).getGhosts().forEach((ghost) ->
         {
-            message.addReceiver(ghost.getAID());
+            try
+            {
+                message.addReceiver(new AID(ghost.getName(), AID.ISGUID));
+            } 
+            catch (StaleProxyException ex) {}
         });
         
         // Informs Pacman...
