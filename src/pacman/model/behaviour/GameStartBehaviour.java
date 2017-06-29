@@ -44,7 +44,10 @@ public class GameStartBehaviour extends OneShotBehaviour
         });
         
         // Informs Pacman...
-        // TODO: Implement
+        try
+        {
+            message.addReceiver(new AID(((GameAgent) myAgent).getPacman().getName(), AID.ISGUID));
+        } catch (StaleProxyException ex) {}
         
         // Sends the message
         myAgent.send(message);

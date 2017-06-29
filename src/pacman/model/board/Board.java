@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 import pacman.model.agent.GhostAgent;
 import pacman.model.core.Constant;
@@ -41,7 +42,7 @@ public class Board
         return ghostsHouses;
     }
     
-    public List<GhostAgent> getGhosts()
+    public synchronized List<GhostAgent> getGhosts()
     {
         List<GhostAgent> ghosts = new ArrayList<>();
         
@@ -63,7 +64,7 @@ public class Board
         return ghosts;
     }
     
-    public Cell getGhostDoor()
+    public synchronized Cell getGhostDoor()
     {
         Cell door = null;
         for (List<Cell> row : previousBoard)
@@ -87,19 +88,47 @@ public class Board
     }
     
     
+    
+    // --- Pacman public methods
+    
+    public synchronized Cell getPacmanHouse()
+    {
+        List<Cell> pacmanHouse = new ArrayList<>();
+        board.forEach(row ->
+        {
+            if (!pacmanHouse.isEmpty())
+            {
+                return;
+            }
+            
+            Optional<Cell> opt = row
+                                    .stream()
+                                    .filter(cell -> CellType.PACMAN_HOUSE == cell.getType())
+                                    .findAny();
+            
+            if (opt.isPresent())
+            {
+                pacmanHouse.add(opt.get());
+            }
+        });
+        
+        return pacmanHouse.get(0);
+    }
+    
+    
     // --- Board general public methods
     
-    public Cell getCell(Coord2D position)
+    public synchronized Cell getCell(Coord2D position)
     {
         return getCell(board, position);
     }
     
-    public void setCell(Cell cell)
+    public synchronized void setCell(Cell cell)
     {
         setCell(board, cell);
     }
     
-    public void moveCell(Cell cell, Coord2D destination)
+    public synchronized void moveCell(Cell cell, Coord2D destination)
     {
         // Updates the current cell position to its previous state
         Cell previousCell = getCell(previousBoard, cell.getPosition());
@@ -113,17 +142,17 @@ public class Board
         setCell(cell);
     }
     
-    public int countRows()
+    public synchronized int countRows()
     {
         return board.size();
     }
     
-    public int countColumns()
+    public synchronized int countColumns()
     {
         return board.get(0).size();
     }
     
-    public void print()
+    public synchronized void print()
     {
         if (!Constant.DEBUG) return;
         
@@ -175,12 +204,12 @@ public class Board
         }
     }
     
-    private Cell getCell(List<List<Cell>> board, Coord2D position)
+    private synchronized Cell getCell(List<List<Cell>> board, Coord2D position)
     {
         return board.get(position.x).get(position.y);
     }
     
-    private void setCell(List<List<Cell>> board, Cell cell)
+    private synchronized void setCell(List<List<Cell>> board, Cell cell)
     {
         board.get(cell.getPosition().x).set(cell.getPosition().y, cell);
     }

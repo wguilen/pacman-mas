@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import pacman.core.ContainerManager;
 import pacman.model.agent.GameAgent;
 import pacman.model.agent.GhostAgent;
+import pacman.model.agent.PacmanAgent;
 import pacman.model.board.Board;
 import pacman.model.board.Cell;
 import pacman.model.core.Constant;
@@ -60,9 +61,13 @@ public class GameLoadBehaviour extends OneShotBehaviour
         }
     }   
     
-    private void loadPacman()
+    private void loadPacman() throws StaleProxyException
     {
-        
+        ((GameAgent) myAgent).incrementWaitingInitialization();
+        Cell house = board.getPacmanHouse();
+        Object[] args = { board, house };
+        AgentController pacman = containerManager.instantiateAgent("Pacman", PacmanAgent.class.getName(), args);
+        ((GameAgent) myAgent).setPacman(pacman);
     }
     
     

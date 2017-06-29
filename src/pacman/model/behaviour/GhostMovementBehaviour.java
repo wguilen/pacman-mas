@@ -60,15 +60,18 @@ public class GhostMovementBehaviour extends SimpleBehaviour
             return;
         }
         
-        // If the ghost received "GET_OUT_MY_WAY", maybe it reverses the
-        //      direction being followed
-        if (((GhostAgent) myAgent).isReverseDirection())
+        synchronized (this)
         {
-            maybeReverseDirection();
-        }
+            // If the ghost received "GET_OUT_MY_WAY", maybe it reverses the
+            //      direction being followed
+            if (((GhostAgent) myAgent).isReverseDirection())
+            {
+                maybeReverseDirection();
+            }
 
-        move();                 // Ghost makes a movement
-        checkGhostOnSamePath(); // Ghost checks if are there another ghosts on the same path
+            move();                 // Ghost makes a movement
+            checkGhostOnSamePath(); // Ghost checks if are there another ghosts on the same path
+        }
     }
 
     @Override
@@ -99,6 +102,11 @@ public class GhostMovementBehaviour extends SimpleBehaviour
                 // Selects a direction to follow
                 for (Direction direction : Direction.values())
                 {
+                    if (direction.equals(Direction.NONE))
+                    {
+                        continue;
+                    }
+                    
                     myNewPosition = getNewPosition(myPosition, direction);
                     nearCell = board.getCell(myNewPosition);
 
@@ -119,7 +127,8 @@ public class GhostMovementBehaviour extends SimpleBehaviour
                 for (Direction direction : Direction.values())
                 {
                     if (direction.equals(getCurrentDirection())
-                            || direction.equals(getLastDirection()))
+                            || direction.equals(getLastDirection())
+                            || direction.equals(Direction.NONE))
                     {
                         continue;
                     }
