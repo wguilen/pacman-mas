@@ -16,7 +16,20 @@ public class GameGuiBehaviour extends TickerBehaviour
     @Override
     protected void onTick()
     {
+        if (shouldStop())
+        {
+            myAgent.removeBehaviour(this);
+            return;
+        }
+        
         ((GameAgent) myAgent).getGui().repaint();
     }
 
+    private boolean shouldStop()
+    {
+        return 0 == (int) ((GameAgent) myAgent).getBoard().getGhosts()
+                                .stream()
+                                .filter(ghost -> !ghost.isHouseLeft())
+                                .count();
+    }
 }

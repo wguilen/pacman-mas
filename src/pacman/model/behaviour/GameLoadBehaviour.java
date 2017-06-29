@@ -52,6 +52,8 @@ public class GameLoadBehaviour extends OneShotBehaviour
         int ghostInstance = 1;
         for (Cell freeGhostsHouse : board.getFreeGhostsHouses())
         {
+            ((GameAgent) myAgent).incrementWaitingInitialization();
+            
             Object[] args = { board, freeGhostsHouse };
             AgentController ghost = containerManager.instantiateAgent("Ghost-" + ghostInstance++, GhostAgent.class.getName(), args);
             ((GameAgent) myAgent).addGhost(ghost);
@@ -84,9 +86,6 @@ public class GameLoadBehaviour extends OneShotBehaviour
                 System.out.println("Fully loaded initial board:");
                 board.print();
             }
-            
-            // Notifies the observers
-            ((GameAgent) myAgent).getObservers().forEach(observer -> observer.onLoaded());
         } 
         catch (StaleProxyException ex)
         {

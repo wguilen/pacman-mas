@@ -1,12 +1,15 @@
 package pacman.model.agent;
 
+import jade.core.AID;
 import jade.core.Agent;
+import jade.lang.acl.ACLMessage;
 import pacman.model.behaviour.GhostLifecycleBehaviour;
-import pacman.model.behaviour.GhostMovementBehaviour;
 import pacman.model.board.Board;
 import pacman.model.board.Cell;
 import pacman.model.board.Direction;
 import pacman.model.board.GhostCell;
+import pacman.model.core.Constant;
+import pacman.model.core.GameVocabulary;
 
 public class GhostAgent extends Agent
 {
@@ -16,10 +19,11 @@ public class GhostAgent extends Agent
     
     // Game control properties
     private boolean houseLeft;              // TRUE when the ghost has left his house - FALSE otherwise
-    private boolean gameRunning;            // TODO: Quando o Pacman for morto, setar o gameRunning = true (pegar o gameRunning do agente que, por sua vez, receberá do GameAgent através de mensagem)
+    private boolean gameRunning;            // TRUE when the game is running - FALSE otherwise
     private Direction currentDirection;     // Tracks the current direction being followed by the ghost
     private Direction lastDirection;        // Tracks the last direction followed by the ghost (actually, it's currentDirection.getReverse())
     private boolean reverseDirection;       // TRUE if ghost receives "GET_OUT_OF_MY_WAY" from another ghost - FALSE otherwise
+    private boolean moving;                 // TRUE if the ghost is moving now - FALSE otherwise
     
     @Override
     protected void setup()
@@ -34,13 +38,20 @@ public class GhostAgent extends Agent
         
         // Inits the control properties
         houseLeft = false;
-        gameRunning = true; // TODO: Change this
+        gameRunning = false;
         reverseDirection = false;
+        moving = false;
         currentDirection = lastDirection = null;
         
         // Adds its behaviour
         addBehaviour(new GhostLifecycleBehaviour(this, board, myCell)); // CyclicBehaviour
-        addBehaviour(new GhostMovementBehaviour(this, board, myCell));  // TickerBehaviour
+        
+        // Notifies game agent I'm loaded
+        ACLMessage message = new ACLMessage(ACLMessage.INFORM);
+        message.setOntology(GameVocabulary.ONTOLOGY);
+        message.setContent(GameVocabulary.AGENT_INITIALIZED);
+        message.addReceiver(new AID(Constant.GAME_AGENT_NAME, AID.ISLOCALNAME));
+        send(message);
     }
 
     
@@ -99,6 +110,16 @@ public class GhostAgent extends Agent
     public void setReverseDirection(boolean reverseDirection)
     {
         this.reverseDirection = reverseDirection;
+    }
+
+    public boolean isMoving()
+    {
+        return moving;
+    }
+
+    public void setMoving(boolean moving)
+    {
+        this.moving = moving;
     }
     
     

@@ -1,7 +1,6 @@
 package pacman.model.behaviour;
 
-import jade.core.Agent;
-import jade.core.behaviours.TickerBehaviour;
+import jade.core.behaviours.SimpleBehaviour;
 import jade.lang.acl.ACLMessage;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,44 +13,53 @@ import pacman.model.board.Coord2D;
 import pacman.model.board.Direction;
 import pacman.model.board.GhostCell;
 import pacman.model.core.Constant;
+import pacman.model.core.GameVocabulary;
 import pacman.model.core.GhostVocabulary;
 
-public class GhostMovementBehaviour extends TickerBehaviour
+public class GhostMovementBehaviour extends SimpleBehaviour
 {
 
-    protected final Board board;
-    protected final Cell myCell;
+    private final Board board;
+    private final Cell myCell;
+    private final ACLMessage originMessage;
 
     // Control properties
-    private boolean reverse = false;    // Tracks if the agent should reverse his direction if another ghost is going in the same direction and is near
+    private boolean reverse;    // Tracks if the agent should reverse his direction if another ghost is going in the same direction and is near
+    private boolean moved;      // Tracks if the ghost has done its movement
 
-    public GhostMovementBehaviour(Agent agent, Board board, Cell myCell)
+    public GhostMovementBehaviour(ACLMessage originMessage, Board board, Cell myCell)
     {
-        super(agent, Constant.MOVEMENT_DELAY);
-
         this.board = board;
         this.myCell = myCell;
+        this.originMessage = originMessage;
+
+        // Inits the game control properties
+        reverse = false;
+        moved = false;
     }
 
     @Override
-    public void onStart()
-    {
-        // Delays a time before starts moving
-        try { Thread.sleep(Constant.GHOST_LEAVE_HOUSE_DELAY); } catch (InterruptedException ex) {}
-    }
-
-    @Override
-    public void onTick()
+    public void action()
     {
         // If the game is not running or the ghost still didn't 
         //      left his house, doesn't move
-        if (!(((GhostAgent) myAgent).isGameRunning()
-                && ((GhostAgent) myAgent).isHouseLeft()))
+        if (!(                                              // If not
+                ((GhostAgent) myAgent).isGameRunning()      // ... game is running
+                && ((GhostAgent) myAgent).isHouseLeft()     // ... the ghost left its house
+           ))
         {
-            //System.out.println(myAgent.getLocalName() + " still didn't left his house...");
+            // Replies to the Game Agent denying this behaviour
+            /*ACLMessage reply = originMessage.createReply();
+            reply.setPerformative(ACLMessage.REFUSE);
+            reply.setContent(GameVocabulary.MOVED_MY_BODY);
+            myAgent.send(reply);*/
+        
+            // Removes this behaviour from the ghost
+            myAgent.removeBehaviour(this);
+            
             return;
         }
-
+        
         // If the ghost received "GET_OUT_MY_WAY", maybe it reverses the
         //      direction being followed
         if (((GhostAgent) myAgent).isReverseDirection())
@@ -61,6 +69,12 @@ public class GhostMovementBehaviour extends TickerBehaviour
 
         move();                 // Ghost makes a movement
         checkGhostOnSamePath(); // Ghost checks if are there another ghosts on the same path
+    }
+
+    @Override
+    public boolean done()
+    {
+        return moved;
     }
 
     private void move()
@@ -150,6 +164,16 @@ public class GhostMovementBehaviour extends TickerBehaviour
 
         // Effectively makes the movement
         board.moveCell(myCell, myNewPosition);
+        moved = true;
+        
+        // Notifies GameAgent I've made my movement
+        ACLMessage reply = originMessage.createReply();
+        reply.setPerformative(ACLMessage.CONFIRM);
+        reply.setContent(GameVocabulary.MOVED_MY_BODY);
+        myAgent.send(reply);
+        
+        // Updates the GhostAgent state
+        ((GhostAgent) myAgent).setMoving(false);
     }
 
     private void checkGhostOnSamePath()
@@ -306,9 +330,9 @@ public class GhostMovementBehaviour extends TickerBehaviour
 
     private boolean isValidDestination(Cell cell)
     {
-        return CellType.DOOR != cell.getType()             // Cannot run to a door
-               && CellType.GHOST_HOUSE != cell.getType()   // Neither to a ghost house
-               && CellType.GHOST != cell.getType()         // Neither to another ghost
+        return CellType.DOOR != cell.getType()              // Cannot run to a door
+               && CellType.GHOST_HOUSE != cell.getType()    // Neither to a ghost house
+               && CellType.GHOST != cell.getType()          // Neither to another ghost
                 && CellType.WALL != cell.getType();         // Neither to a wall
     }
 
@@ -373,5 +397,5 @@ public class GhostMovementBehaviour extends TickerBehaviour
     {
         ((GhostAgent) myAgent).setLastDirection(direction);
     }
-    
+
 }

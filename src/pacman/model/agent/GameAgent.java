@@ -1,5 +1,6 @@
 package pacman.model.agent;
 
+import jade.core.AID;
 import jade.core.Agent;
 import jade.wrapper.AgentController;
 import java.io.FileNotFoundException;
@@ -7,8 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import pacman.model.behaviour.GameLoadBehaviour;
 import pacman.model.behaviour.GameGuiBehaviour;
+import pacman.model.behaviour.GameLifecycleBehaviour;
+import pacman.model.behaviour.GameLoadBehaviour;
+import pacman.model.behaviour.GameMovementBehaviour;
 import pacman.model.behaviour.GameStartBehaviour;
 import pacman.model.behaviour.GameTogglePauseBehaviour;
 import pacman.model.board.Board;
@@ -21,25 +24,32 @@ public class GameAgent extends Agent
     private Board board;
     private GameGui myGui;
     
-    // Game agents
-    private final List<AgentController> ghosts;
-    private AgentController pacman;
-
+    // Game agents controllers
+    private final List<AgentController> ghostsControllers;
+    private AgentController pacmanController;
+    
     // Observers
     private final List<GameListener> observers;
     
     // Game control properties
-    private boolean gameRunning;    // TRUE if the game has already started and is running - FALSE otherwise
+    private int waitingInitialization;      // Tracks the number of agents that hasn't setup yet
+    private boolean gameRunning;            // TRUE if the game has already started and is running - FALSE otherwise
+    private final List<AID> agentsToMove;   // Tracks the agents the has to do their movement on the board before the turn ends
+    private boolean turnComplete;           // Tracks if a complete turn of the game was made
     
     // --- Ctors
 
     public GameAgent()
     {
-        ghosts = new ArrayList<>();
+        // Game agents controllers
+        ghostsControllers = new ArrayList<>();
         observers = new ArrayList<>();
         
         // Inits game control properties
+        waitingInitialization = 0;
         gameRunning = false;
+        turnComplete = true;
+        agentsToMove = new ArrayList<>();
     }
     
     
@@ -48,6 +58,8 @@ public class GameAgent extends Agent
     @Override
     protected void setup()
     {
+        addBehaviour(new GameLifecycleBehaviour());
+        
         try
         {
             addBehaviour(new GameLoadBehaviour(this, (String) getArguments()[0]));
@@ -67,6 +79,7 @@ public class GameAgent extends Agent
     public void startGame()
     {
         addBehaviour(new GameGuiBehaviour(this));
+        addBehaviour(new GameMovementBehaviour(this));
         addBehaviour(new GameStartBehaviour(this, board));
     }
     
@@ -81,22 +94,22 @@ public class GameAgent extends Agent
     
     public void addGhost(AgentController ghost)
     {
-        ghosts.add(ghost);
+        ghostsControllers.add(ghost);
     }
 
     public List<AgentController> getGhosts()
     {
-        return ghosts;
+        return ghostsControllers;
     }
 
     public AgentController getPacman()
     {
-        return pacman;
+        return pacmanController;
     }
 
     public void setPacman(AgentController pacman)
     {
-        this.pacman = pacman;
+        this.pacmanController = pacman;
     }
     
     public Board getBoard()
@@ -114,6 +127,21 @@ public class GameAgent extends Agent
         return myGui;
     }
 
+    public int getWaitingInitialization()
+    {
+        return waitingInitialization;
+    }
+
+    public void incrementWaitingInitialization()
+    {
+        ++waitingInitialization;
+    }
+    
+    public void decrementWaitingInitialization()
+    {
+        --waitingInitialization;
+    }
+    
     public void setGameRunning(boolean gameRunning)
     {
         this.gameRunning = gameRunning;
@@ -122,6 +150,37 @@ public class GameAgent extends Agent
     public boolean isGameRunning()
     {
         return gameRunning;
+    }
+
+    public boolean isAllAgentsMoved()
+    {
+        return agentsToMove.isEmpty();
+    }
+
+    public void addAgentToMove(AID agentAID)
+    {
+        if (!agentsToMove.contains(agentAID))
+        {
+            agentsToMove.add(agentAID);
+        }
+    }
+    
+    public void removeAgentToMove(AID agentAID)
+    {
+        if (agentsToMove.contains(agentAID))
+        {
+            agentsToMove.remove(agentAID);
+        }
+    }
+
+    public boolean isTurnComplete()
+    {
+        return turnComplete;
+    }
+
+    public void setTurnComplete(boolean turnComplete)
+    {
+        this.turnComplete = turnComplete;
     }
     
     public void addObserver(GameListener observer)

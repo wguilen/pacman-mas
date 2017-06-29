@@ -19,6 +19,12 @@ public class GhostLeaveHouseFirstBehaviour extends GhostLeaveHouseBehaviour
     @Override
     public void onTick()
     {
+        if (!(((GhostAgent) myAgent).isGameRunning())
+                && !((GhostAgent) myAgent).isHouseLeft())
+        {
+            return;
+        }
+        
         // Tries to leave the house
         Coord2D doorPosition = board.getGhostDoor().getPosition();
         Coord2D myNewPosition = null;
