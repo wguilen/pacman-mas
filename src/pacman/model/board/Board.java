@@ -47,10 +47,16 @@ public class Board
         
         board.forEach((row) ->
         {
-            row.stream().filter((cell) ->
-                (cell instanceof GhostCell)).forEachOrdered((cell) ->
+            row
+                .stream()
+                .filter(cell -> cell instanceof GhostCell)
+                .forEach(cell ->
             {
-                ghosts.add(((GhostCell) cell).getAgent());
+                GhostAgent ghost = ((GhostCell) cell).getAgent();
+                if (!ghosts.contains(ghost))
+                {
+                    ghosts.add(ghost);
+                }
             });
         });
         

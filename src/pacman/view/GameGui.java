@@ -90,4 +90,10 @@ public class GameGui extends JFrame implements GameListener
         myAgent.startGame();
     }
 
+    @Override
+    public void onTurn()
+    {
+        repaint();
+    }
+
 }

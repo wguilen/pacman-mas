@@ -7,8 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import pacman.model.behaviour.GameLifecycleBehaviour;
 import pacman.model.behaviour.GameLoadBehaviour;
-import pacman.model.behaviour.GameGuiBehaviour;
+import pacman.model.behaviour.GameMovementBehaviour;
 import pacman.model.behaviour.GameStartBehaviour;
 import pacman.model.behaviour.GameTogglePauseBehaviour;
 import pacman.model.board.Board;
@@ -21,25 +22,36 @@ public class GameAgent extends Agent
     private Board board;
     private GameGui myGui;
     
+    // Game agents controllers
+    private final List<AgentController> ghostsControllers;
+    private AgentController pacmanController;
+    
     // Game agents
-    private final List<AgentController> ghosts;
-    private AgentController pacman;
-
+    //private final List<GhostAgent> ghosts;
+    
     // Observers
     private final List<GameListener> observers;
     
     // Game control properties
     private boolean gameRunning;    // TRUE if the game has already started and is running - FALSE otherwise
+    private int movedCounter;       // Tracks the quantity of agents the has done their movement on the board
+    private boolean turnComplete;   // Tracks if a complete turn of the game was made
     
     // --- Ctors
 
     public GameAgent()
     {
-        ghosts = new ArrayList<>();
+        // Game agents controllers
+        ghostsControllers = new ArrayList<>();
         observers = new ArrayList<>();
+        
+        // Game agents
+        //ghosts = new ArrayList<>();
         
         // Inits game control properties
         gameRunning = false;
+        movedCounter = 0;
+        turnComplete = true;
     }
     
     
@@ -66,7 +78,9 @@ public class GameAgent extends Agent
     
     public void startGame()
     {
-        addBehaviour(new GameGuiBehaviour(this));
+        //addBehaviour(new GameGuiBehaviour(this));
+        addBehaviour(new GameLifecycleBehaviour());
+        addBehaviour(new GameMovementBehaviour(this));
         addBehaviour(new GameStartBehaviour(this, board));
     }
     
@@ -81,22 +95,22 @@ public class GameAgent extends Agent
     
     public void addGhost(AgentController ghost)
     {
-        ghosts.add(ghost);
+        ghostsControllers.add(ghost);
     }
 
     public List<AgentController> getGhosts()
     {
-        return ghosts;
+        return ghostsControllers;
     }
 
     public AgentController getPacman()
     {
-        return pacman;
+        return pacmanController;
     }
 
     public void setPacman(AgentController pacman)
     {
-        this.pacman = pacman;
+        this.pacmanController = pacman;
     }
     
     public Board getBoard()
@@ -122,6 +136,31 @@ public class GameAgent extends Agent
     public boolean isGameRunning()
     {
         return gameRunning;
+    }
+
+    public int getMovedCounter()
+    {
+        return movedCounter;
+    }
+
+    public void resetMovedCounter()
+    {
+        movedCounter = 0;
+    }
+    
+    public void incrementMovedCounter()
+    {
+        ++movedCounter;
+    }
+
+    public boolean isTurnComplete()
+    {
+        return turnComplete;
+    }
+
+    public void setTurnComplete(boolean turnComplete)
+    {
+        this.turnComplete = turnComplete;
     }
     
     public void addObserver(GameListener observer)
