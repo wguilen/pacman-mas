@@ -91,7 +91,7 @@ public class GameGui extends JFrame implements GameListener
     }
 
     @Override
-    public void onTurn()
+    public void onTurnComplete()
     {
         repaint();
     }

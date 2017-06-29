@@ -39,22 +39,16 @@ public class GhostMovementBehaviour extends SimpleBehaviour
     }
 
     @Override
-    public void onStart()
-    {
-        // Delays a time before starts moving
-        try { Thread.sleep(Constant.GHOST_LEAVE_HOUSE_DELAY); } catch (InterruptedException ex) {}
-    }
-    
-    @Override
     public void action()
     {
         // If the game is not running or the ghost still didn't 
         //      left his house, doesn't move
-        if (!(((GhostAgent) myAgent).isGameRunning()
-                && ((GhostAgent) myAgent).isHouseLeft()
-                && false == moved))
+        if (!(                                              // If not
+                ((GhostAgent) myAgent).isGameRunning()      // ... game is running
+                && ((GhostAgent) myAgent).isHouseLeft()     // ... the ghost left its house
+                && !((GhostAgent) myAgent).isMoving())      // ... and the ghost hasn't started moving yet // TODO: Fix this (continue from here...)
+           )
         {
-            //System.out.println(myAgent.getLocalName() + " still didn't left his house...");
             return;
         }
 
@@ -72,12 +66,6 @@ public class GhostMovementBehaviour extends SimpleBehaviour
     @Override
     public boolean done()
     {
-        if (moved)
-        {
-            //myAgent.removeBehaviour(this);
-            //((GhostAgent) myAgent).setMoving(false);
-        }
-        
         return moved;
     }
 

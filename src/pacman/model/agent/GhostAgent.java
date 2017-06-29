@@ -41,7 +41,6 @@ public class GhostAgent extends Agent
         
         // Adds its behaviour
         addBehaviour(new GhostLifecycleBehaviour(this, board, myCell)); // CyclicBehaviour
-        //addBehaviour(new GhostMovementBehaviour(board, myCell));        // SimpleBehaviour
     }
 
     
