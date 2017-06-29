@@ -33,7 +33,7 @@ public class GameAgent extends Agent
     
     // Game control properties
     private boolean gameRunning;            // TRUE if the game has already started and is running - FALSE otherwise
-    private final List<AID> movedAgents;    // Tracks the quantity of agents the has done their movement on the board
+    private final List<AID> agentsToMove;   // Tracks the agents the has to do their movement on the board before the turn ends
     private boolean turnComplete;           // Tracks if a complete turn of the game was made
     
     // --- Ctors
@@ -47,7 +47,7 @@ public class GameAgent extends Agent
         // Inits game control properties
         gameRunning = false;
         turnComplete = true;
-        movedAgents = new ArrayList<>();
+        agentsToMove = new ArrayList<>();
     }
     
     
@@ -134,21 +134,24 @@ public class GameAgent extends Agent
         return gameRunning;
     }
 
-    public int getMovedCounter()
+    public boolean isAllAgentsMoved()
     {
-        return movedAgents.size();
+        return agentsToMove.isEmpty();
     }
 
-    public void resetMoved()
+    public void addAgentToMove(AID agentAID)
     {
-        movedAgents.clear();
+        if (!agentsToMove.contains(agentAID))
+        {
+            agentsToMove.add(agentAID);
+        }
     }
     
-    public void addMovedAgent(AID agentAID)
+    public void removeAgentToMove(AID agentAID)
     {
-        if (!movedAgents.contains(agentAID))
+        if (agentsToMove.contains(agentAID))
         {
-            movedAgents.add(agentAID);
+            agentsToMove.remove(agentAID);
         }
     }
 

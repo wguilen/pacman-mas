@@ -1,11 +1,12 @@
 package pacman.model.behaviour;
 
-import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
-import jade.wrapper.StaleProxyException;
+import java.util.List;
+import java.util.stream.Collectors;
 import pacman.model.agent.GameAgent;
+import pacman.model.agent.GhostAgent;
 import pacman.model.core.Constant;
 import pacman.model.core.GameVocabulary;
 
@@ -32,16 +33,25 @@ public class GameMovementBehaviour extends TickerBehaviour
         message.setOntology(GameVocabulary.ONTOLOGY);
         message.setContent(GameVocabulary.MOVE_YOUR_BODY);
         
-        ((GameAgent) myAgent).getGhosts().forEach((ghost) ->
+        List<GhostAgent> ghosts = ((GameAgent) myAgent).getBoard().getGhosts()
+                                    .stream()
+                                    .filter(ghost -> ghost.isHouseLeft())
+                                    .collect(Collectors.toList());
+
+        if (!ghosts.isEmpty())
         {
-            try
+            ghosts.forEach(ghost -> 
             {
-                message.addReceiver(new AID(ghost.getName(), AID.ISGUID));
-            } 
-            catch (StaleProxyException ex) {}
-        });
-        
-        myAgent.send(message);
+                message.addReceiver(ghost.getAID());
+                ((GameAgent) myAgent).addAgentToMove(ghost.getAID());
+            });
+
+            myAgent.send(message);
+        }
+        else
+        {
+            ((GameAgent) myAgent).setTurnComplete(true);
+        }
     }
 
 }

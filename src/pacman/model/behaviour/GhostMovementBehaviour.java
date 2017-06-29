@@ -48,9 +48,18 @@ public class GhostMovementBehaviour extends SimpleBehaviour
                 && ((GhostAgent) myAgent).isHouseLeft()     // ... the ghost left its house
            ))
         {
+            // Replies to the Game Agent denying this behaviour
+            /*ACLMessage reply = originMessage.createReply();
+            reply.setPerformative(ACLMessage.REFUSE);
+            reply.setContent(GameVocabulary.MOVED_MY_BODY);
+            myAgent.send(reply);*/
+        
+            // Removes this behaviour from the ghost
+            myAgent.removeBehaviour(this);
+            
             return;
         }
-
+        
         // If the ghost received "GET_OUT_MY_WAY", maybe it reverses the
         //      direction being followed
         if (((GhostAgent) myAgent).isReverseDirection())

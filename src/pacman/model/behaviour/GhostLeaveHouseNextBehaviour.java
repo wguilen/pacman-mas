@@ -36,7 +36,8 @@ public class GhostLeaveHouseNextBehaviour extends GhostLeaveHouseBehaviour
     @SuppressWarnings("SleepWhileInLoop")
     public void onTick()
     {
-        if (!(((GhostAgent) myAgent).isGameRunning()) && startMoving)
+        if (!(((GhostAgent) myAgent).isGameRunning()) && startMoving 
+                && !((GhostAgent) myAgent).isHouseLeft())
         {
             return;
         }
@@ -53,8 +54,8 @@ public class GhostLeaveHouseNextBehaviour extends GhostLeaveHouseBehaviour
             {
                 // Leaves the house
                 System.out.println(myAgent.getLocalName() + " leaving house by " + direction.toString().toLowerCase());
-                ((GhostAgent) myAgent).setHouseLeft(true);
                 board.moveCell(myCell, myNewPosition);
+                ((GhostAgent) myAgent).setHouseLeft(true);
                 board.print();
 
                 // Advices the next ghost (if any) to leave his house

@@ -37,19 +37,11 @@ public class GameLifecycleBehaviour extends CyclicBehaviour
     
     private void handleAgentsMovement(AID agentAID)
     {
-        // Increments the counter of agents that has made their movement
-        ((GameAgent) myAgent).addMovedAgent(agentAID);
+        // The agent has done its movement
+        ((GameAgent) myAgent).removeAgentToMove(agentAID);
 
-        // Counts the number of agents that has to move
-        int ghosts = (int) ((GameAgent) myAgent).getBoard().getGhosts()
-                                .stream()
-                                .filter(ghost -> ghost.isHouseLeft())
-                                .count();
-        
-        // If the counter is equal to the quantity of agents,
-        //      notifies the observers and resets the counter
-        // IE, the movement is done on the board
-        if (((GameAgent) myAgent).getMovedCounter() == (ghosts))    // TODO: Change to Ghosts + 1 (Pacman)
+        // If all agents has done their movements
+        if (((GameAgent) myAgent).isAllAgentsMoved())
         {
             ((GameAgent) myAgent).getObservers().forEach(observer ->
             {
@@ -57,8 +49,6 @@ public class GameLifecycleBehaviour extends CyclicBehaviour
             });
             
             System.out.println("Turn is complete...");
-            
-            ((GameAgent) myAgent).resetMoved();
             ((GameAgent) myAgent).setTurnComplete(true);
         }
     }
