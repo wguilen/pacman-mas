@@ -32,6 +32,7 @@ public class GameAgent extends Agent
     private final List<GameListener> observers;
     
     // Game control properties
+    private int waitingInitialization;      // Tracks the number of agents that hasn't setup yet
     private boolean gameRunning;            // TRUE if the game has already started and is running - FALSE otherwise
     private final List<AID> agentsToMove;   // Tracks the agents the has to do their movement on the board before the turn ends
     private boolean turnComplete;           // Tracks if a complete turn of the game was made
@@ -45,6 +46,7 @@ public class GameAgent extends Agent
         observers = new ArrayList<>();
         
         // Inits game control properties
+        waitingInitialization = 0;
         gameRunning = false;
         turnComplete = true;
         agentsToMove = new ArrayList<>();
@@ -56,6 +58,8 @@ public class GameAgent extends Agent
     @Override
     protected void setup()
     {
+        addBehaviour(new GameLifecycleBehaviour());
+        
         try
         {
             addBehaviour(new GameLoadBehaviour(this, (String) getArguments()[0]));
@@ -75,7 +79,6 @@ public class GameAgent extends Agent
     public void startGame()
     {
         addBehaviour(new GameGuiBehaviour(this));
-        addBehaviour(new GameLifecycleBehaviour());
         addBehaviour(new GameMovementBehaviour(this));
         addBehaviour(new GameStartBehaviour(this, board));
     }
@@ -124,6 +127,21 @@ public class GameAgent extends Agent
         return myGui;
     }
 
+    public int getWaitingInitialization()
+    {
+        return waitingInitialization;
+    }
+
+    public void incrementWaitingInitialization()
+    {
+        ++waitingInitialization;
+    }
+    
+    public void decrementWaitingInitialization()
+    {
+        --waitingInitialization;
+    }
+    
     public void setGameRunning(boolean gameRunning)
     {
         this.gameRunning = gameRunning;

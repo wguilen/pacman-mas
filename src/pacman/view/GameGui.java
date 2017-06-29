@@ -96,4 +96,10 @@ public class GameGui extends JFrame implements GameListener
         repaint();
     }
 
+    @Override
+    public void onAgentInitialized()
+    {
+        repaint();
+    }
+
 }

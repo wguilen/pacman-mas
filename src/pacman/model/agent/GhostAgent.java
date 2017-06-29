@@ -1,11 +1,15 @@
 package pacman.model.agent;
 
+import jade.core.AID;
 import jade.core.Agent;
+import jade.lang.acl.ACLMessage;
 import pacman.model.behaviour.GhostLifecycleBehaviour;
 import pacman.model.board.Board;
 import pacman.model.board.Cell;
 import pacman.model.board.Direction;
 import pacman.model.board.GhostCell;
+import pacman.model.core.Constant;
+import pacman.model.core.GameVocabulary;
 
 public class GhostAgent extends Agent
 {
@@ -41,6 +45,13 @@ public class GhostAgent extends Agent
         
         // Adds its behaviour
         addBehaviour(new GhostLifecycleBehaviour(this, board, myCell)); // CyclicBehaviour
+        
+        // Notifies game agent I'm loaded
+        ACLMessage message = new ACLMessage(ACLMessage.INFORM);
+        message.setOntology(GameVocabulary.ONTOLOGY);
+        message.setContent(GameVocabulary.AGENT_INITIALIZED);
+        message.addReceiver(new AID(Constant.GAME_AGENT_NAME, AID.ISLOCALNAME));
+        send(message);
     }
 
     

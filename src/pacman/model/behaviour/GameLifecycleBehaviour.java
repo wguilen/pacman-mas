@@ -21,8 +21,12 @@ public class GameLifecycleBehaviour extends CyclicBehaviour
             
             switch (message.getContent())
             {
+                case GameVocabulary.AGENT_INITIALIZED:
+                    handleAgentInitialized();
+                    break;
+                
                 case GameVocabulary.MOVED_MY_BODY:
-                    handleAgentsMovement(message.getSender());
+                    handleAgentMovement(message.getSender());
                     break;
                     
                 default:
@@ -35,7 +39,27 @@ public class GameLifecycleBehaviour extends CyclicBehaviour
         }
     }
     
-    private void handleAgentsMovement(AID agentAID)
+    private void handleAgentInitialized()
+    {
+        ((GameAgent) myAgent).decrementWaitingInitialization();
+        
+        // After all agents are initialized...
+        if (0 == ((GameAgent) myAgent).getWaitingInitialization())
+        {
+            System.out.println("Initing game...");
+            
+            // ... notifies the game loaded observers
+            ((GameAgent) myAgent).getObservers().forEach(observer -> observer.onLoaded());
+        }
+        // Else...
+        else
+        {
+            // ... notifies the agents initialized observers
+            ((GameAgent) myAgent).getObservers().forEach(observer -> observer.onAgentInitialized());
+        }
+    }
+    
+    private void handleAgentMovement(AID agentAID)
     {
         // The agent has done its movement
         ((GameAgent) myAgent).removeAgentToMove(agentAID);

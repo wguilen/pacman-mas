@@ -63,7 +63,7 @@ public class GhostLeaveHouseNextBehaviour extends GhostLeaveHouseBehaviour
                 myAgent.removeBehaviour(this);
                 
                 // Delays a time before the next ghost leaves the door
-                try { Thread.sleep(Constant.MOVEMENT_DELAY); } catch (InterruptedException ex) {}
+                try { Thread.sleep(Constant.MOVEMENT_DELAY * 2); } catch (InterruptedException ex) {}
 
                 return;
             }
