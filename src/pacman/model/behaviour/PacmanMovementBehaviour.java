@@ -127,7 +127,7 @@ public class PacmanMovementBehaviour extends SimpleBehaviour
                         float changeDirection = ThreadLocalRandom.current().nextFloat();
 
                         // May I follow it?
-                        if (changeDirection <= Constant.GHOST_TURN_ON_BIFURCATION_CHANCE)
+                        if (changeDirection <= Constant.PACMAN_TURN_ON_BIFURCATION_CHANCE)
                         {
                             cellSelected = true;
                             setCurrentDirection(direction);
