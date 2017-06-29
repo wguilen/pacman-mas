@@ -1,6 +1,5 @@
 package pacman.model.behaviour;
 
-import jade.core.behaviours.SimpleBehaviour;
 import jade.lang.acl.ACLMessage;
 import java.util.concurrent.ThreadLocalRandom;
 import pacman.model.agent.PacmanAgent;
@@ -12,24 +11,12 @@ import pacman.model.board.Direction;
 import pacman.model.core.Constant;
 import pacman.model.core.GameVocabulary;
 
-public class PacmanMovementBehaviour extends SimpleBehaviour
+public class PacmanMovementBehaviour extends BaseMovementBehaviour
 {
-
-    private final Board board;
-    private final Cell myCell;
-    private final ACLMessage originMessage;
-
-    // Control properties
-    private boolean moved;      // Tracks if Pacman has done its movement
 
     public PacmanMovementBehaviour(ACLMessage originMessage, Board board, Cell myCell)
     {
-        this.board = board;
-        this.myCell = myCell;
-        this.originMessage = originMessage;
-
-        // Inits the game control properties
-        moved = false;
+        super(originMessage, board, myCell);
     }
 
     @Override
@@ -57,12 +44,6 @@ public class PacmanMovementBehaviour extends SimpleBehaviour
         {
             move(); // Pacman makes a movement
         }
-    }
-
-    @Override
-    public boolean done()
-    {
-        return moved;
     }
 
     private void move()
@@ -170,60 +151,36 @@ public class PacmanMovementBehaviour extends SimpleBehaviour
         ((PacmanAgent) myAgent).setMoving(false);
     }
 
-    private boolean isValidDestination(Cell cell)
+    @Override
+    protected boolean isValidDestination(Cell cell)
     {
-        return CellType.DOOR != cell.getType()              // Cannot run to a door
-               && CellType.GHOST != cell.getType()          // Neither to a ghost // TODO: Remove this and treat it
-               && CellType.GHOST_HOUSE != cell.getType()    // Neither to a ghost house
-               && CellType.WALL != cell.getType();          // Neither to a wall
-    }
-
-    private Coord2D getNewPosition(Coord2D currentPosition, Direction destination)
-    {
-        Coord2D newPosition = new Coord2D(currentPosition.x + destination.xInc, currentPosition.y + destination.yInc);
-
-        // Validates x position
-        if (newPosition.x < 0)
-        {
-            newPosition = new Coord2D(board.countRows() - 1, newPosition.y);
-        } 
-        else if (newPosition.x > board.countRows() - 1)
-        {
-            newPosition = new Coord2D(0, newPosition.y);
-        }
-
-        // Validates y position        
-        if (newPosition.y < 0)
-        {
-            newPosition = new Coord2D(newPosition.x, board.countColumns() - 1);
-        } 
-        else if (newPosition.y > board.countColumns() - 1)
-        {
-            newPosition = new Coord2D(newPosition.x, 0);
-        }
-
-        return newPosition;
+        return super.isValidDestination(cell)       // Cannot run to a door, ghost house or wall
+               && CellType.GHOST != cell.getType(); // Neither to another ghost // TODO: Remove this and treat
     }
 
     
     // --- Getters and setters
     
-    private Direction getCurrentDirection()
+    @Override
+    protected Direction getCurrentDirection()
     {
         return ((PacmanAgent) myAgent).getCurrentDirection();
     }
 
-    private void setCurrentDirection(Direction direction)
+    @Override
+    protected void setCurrentDirection(Direction direction)
     {
         ((PacmanAgent) myAgent).setCurrentDirection(direction);
     }
 
-    private Direction getLastDirection()
+    @Override
+    protected Direction getLastDirection()
     {
         return ((PacmanAgent) myAgent).getLastDirection();
     }
 
-    private void setLastDirection(Direction direction)
+    @Override
+    protected void setLastDirection(Direction direction)
     {
         ((PacmanAgent) myAgent).setLastDirection(direction);
     }
