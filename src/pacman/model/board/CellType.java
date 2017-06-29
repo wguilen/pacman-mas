@@ -11,7 +11,7 @@ public enum CellType
     PACMAN('P', Color.ORANGE),          // Pacman agent
     GHOST_HOUSE('H', Color.BLACK),      // Ghost house (Ghosts agents initial position)
     GHOST('G', Color.WHITE),            // Ghost agent
-    DOOR('D', Color.BLUE),              // Door (for the ghosts to leave their houses)
+    DOOR('D', Color.GRAY),              // Door (for the ghosts to leave their houses)
     DOT('.', Color.YELLOW),             // Simple collectible item
     POWERUP('U', Color.GREEN);          // Powerup collectible item
  
