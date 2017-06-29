@@ -6,6 +6,7 @@ import java.awt.event.WindowAdapter;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import pacman.model.agent.GameAgent;
 import pacman.model.observer.GameListener;
 import pacman.view.component.BoardGui;
@@ -85,19 +86,25 @@ public class GameGui extends JFrame implements GameListener
     // --- GameListener
     
     @Override
+    public void onAgentInitialized()
+    {
+        repaint();
+    }
+    
+    @Override
     public void onLoaded()
     {
         myAgent.startGame();
     }
 
     @Override
-    public void onTurnComplete()
+    public void onPacmanKilled(String killer)
     {
-        repaint();
+        JOptionPane.showMessageDialog(this, "Pacman was killed by " + killer + "!", "End game", JOptionPane.INFORMATION_MESSAGE);
     }
 
     @Override
-    public void onAgentInitialized()
+    public void onTurnComplete()
     {
         repaint();
     }

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 import pacman.model.agent.GhostAgent;
+import pacman.model.agent.PacmanAgent;
 import pacman.model.core.Constant;
 
 public class Board
@@ -113,6 +114,36 @@ public class Board
         });
         
         return pacmanHouse.get(0);
+    }
+    
+    public synchronized PacmanAgent getPacman()
+    {
+        List<PacmanAgent> pacman = new ArrayList<>();
+        board.forEach(row ->
+        {
+            if (!pacman.isEmpty())
+            {
+                return;
+            }
+            
+            Optional<Cell> opt = row
+                                    .stream()
+                                    .filter(cell -> cell instanceof PacmanCell)
+                                    .findAny();
+            
+            if (opt.isPresent())
+            {
+                pacman.add(((PacmanCell) opt.get()).getAgent());
+            }
+        });
+        
+        return pacman.get(0);
+    }
+    
+    public synchronized void removePacman(Cell pacmanCell)
+    {
+        Cell previousCell = getCell(board, pacmanCell.getPosition());
+        setCell(previousCell);
     }
     
     

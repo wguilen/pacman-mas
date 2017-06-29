@@ -7,6 +7,7 @@ import pacman.model.agent.PacmanAgent;
 import pacman.model.board.Board;
 import pacman.model.board.Cell;
 import pacman.model.core.GameVocabulary;
+import pacman.model.core.GhostVocabulary;
 
 public class PacmanLifecycleBehaviour extends CyclicBehaviour
 {
@@ -50,6 +51,19 @@ public class PacmanLifecycleBehaviour extends CyclicBehaviour
                                 myAgent.addBehaviour(new PacmanMovementBehaviour(message, board, myCell));
                             }
                             
+                            break;
+                            
+                        default:
+                            block();
+                    }
+                    
+                    break;
+                    
+                case GhostVocabulary.ONTOLOGY:
+                    switch (message.getContent())
+                    {
+                        case GhostVocabulary.I_KILLED_YOU:
+                            myAgent.doDelete();
                             break;
                             
                         default:

@@ -10,6 +10,20 @@ import pacman.model.core.GameVocabulary;
 public class GameLifecycleBehaviour extends CyclicBehaviour
 {
 
+    // Game control properties
+    private String pacmanKiller;
+
+    
+    // --- Ctors
+    
+    public GameLifecycleBehaviour()
+    {
+        pacmanKiller = null;
+    }
+    
+    
+    // --- Public overriden methods
+    
     @Override
     public void action()
     {
@@ -25,6 +39,11 @@ public class GameLifecycleBehaviour extends CyclicBehaviour
                     handleAgentInitialized();
                     break;
                 
+                case GameVocabulary.END:
+                    ((GameAgent) myAgent).setGameEnded(true);
+                    pacmanKiller = message.getSender().getLocalName();
+                    break;
+                    
                 case GameVocabulary.MOVED_MY_BODY:
                     handleAgentMovement(message.getSender());
                     break;
@@ -38,6 +57,9 @@ public class GameLifecycleBehaviour extends CyclicBehaviour
             block();
         }
     }
+    
+    
+    // --- Private auxiliary methods
     
     private void handleAgentInitialized()
     {
@@ -64,8 +86,6 @@ public class GameLifecycleBehaviour extends CyclicBehaviour
         // The agent has done its movement
         ((GameAgent) myAgent).removeAgentToMove(agentAID);
 
-        System.out.println(((GameAgent) myAgent).isAllAgentsMoved() + " == All agents moved");
-        
         // If all agents has done their movements
         if (((GameAgent) myAgent).isAllAgentsMoved())
         {
@@ -76,7 +96,15 @@ public class GameLifecycleBehaviour extends CyclicBehaviour
             
             System.out.println("Turn is complete...");
             ((GameAgent) myAgent).setTurnComplete(true);
+            
+            if (((GameAgent) myAgent).isGameEnded())
+            {
+                ((GameAgent) myAgent).setGameRunning(false);
+                ((GameAgent) myAgent).getObservers()
+                        .forEach(observer -> observer.onPacmanKilled(pacmanKiller));
+            }
         }
+        
     }
 
 }

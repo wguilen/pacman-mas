@@ -74,6 +74,12 @@ public class GhostLifecycleBehaviour extends CyclicBehaviour
                             ((GhostAgent) myAgent).setReverseDirection(true);
                             break;
                             
+                        case GhostVocabulary.THE_MOTHERFUCKER_IS_DEAD:
+                            ((GhostAgent) myAgent).setGameRunning(false);
+                            System.out.println("YAAAAAY! " + myAgent.getLocalName() + " is happy because "
+                                    + "Pacman is finally dead!");
+                            break;
+                            
                         default:
                             block();
                     }
