@@ -49,6 +49,12 @@ public class PacmanAgent extends Agent
         message.addReceiver(new AID(Constant.GAME_AGENT_NAME, AID.ISLOCALNAME));
         send(message);
     }
+
+    @Override
+    protected void takeDown()
+    {
+        board.removePacman(myCell);
+    }
     
     
     // --- Getters and setters

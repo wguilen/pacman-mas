@@ -28,6 +28,13 @@ public class GameMovementBehaviour extends TickerBehaviour
         {
             return;
         }
+
+
+        if (((GameAgent) myAgent).isGameEnded())
+        {
+            myAgent.removeBehaviour(this);
+            return;
+        }        
         
         ((GameAgent) myAgent).setTurnComplete(false);
         

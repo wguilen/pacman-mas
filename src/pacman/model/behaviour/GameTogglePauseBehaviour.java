@@ -32,7 +32,11 @@ public class GameTogglePauseBehaviour extends OneShotBehaviour
         });
         
         // Informs Pacman...
-        // TODO
+        try
+        {
+            message.addReceiver(new AID(((GameAgent) myAgent).getPacman().getName(), AID.ISGUID));
+        } 
+        catch (StaleProxyException ex) {}
         
         // Sends the message
         myAgent.send(message);

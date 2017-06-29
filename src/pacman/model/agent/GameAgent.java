@@ -36,6 +36,7 @@ public class GameAgent extends Agent
     private boolean gameRunning;            // TRUE if the game has already started and is running - FALSE otherwise
     private final List<AID> agentsToMove;   // Tracks the agents the has to do their movement on the board before the turn ends
     private boolean turnComplete;           // Tracks if a complete turn of the game was made
+    private boolean gameEnded;              // TRUE if the game has already ended - FALSE otherwise
     
     // --- Ctors
 
@@ -48,6 +49,7 @@ public class GameAgent extends Agent
         // Inits game control properties
         waitingInitialization = 0;
         gameRunning = false;
+        gameEnded = false;
         turnComplete = true;
         agentsToMove = new ArrayList<>();
     }
@@ -152,6 +154,16 @@ public class GameAgent extends Agent
         return gameRunning;
     }
 
+    public boolean isGameEnded()
+    {
+        return gameEnded;
+    }
+
+    public void setGameEnded(boolean gameEnded)
+    {
+        this.gameEnded = gameEnded;
+    }
+    
     public boolean isAllAgentsMoved()
     {
         return agentsToMove.isEmpty();

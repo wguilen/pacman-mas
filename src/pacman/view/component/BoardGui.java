@@ -49,7 +49,7 @@ public class BoardGui extends JPanel
         {
             for (int j = 0; j < board.countColumns(); ++j)
             {
-                board.getCell(new Coord2D(i, j)).draw(canvas); // TODO: Change draw to Coord2D (or use the cell position? think it's better!!!)
+                board.getCell(new Coord2D(i, j)).draw(canvas);
             }
         }
         
