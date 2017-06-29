@@ -4,6 +4,6 @@ public interface GameListener
 {
     
     void onLoaded();
-    void onTurn();
+    void onTurnComplete();
     
 }

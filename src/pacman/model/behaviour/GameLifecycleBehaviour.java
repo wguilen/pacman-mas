@@ -1,9 +1,9 @@
 package pacman.model.behaviour;
 
+import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import java.util.stream.Collectors;
 import pacman.model.agent.GameAgent;
 import pacman.model.core.GameVocabulary;
 
@@ -22,7 +22,7 @@ public class GameLifecycleBehaviour extends CyclicBehaviour
             switch (message.getContent())
             {
                 case GameVocabulary.MOVED_MY_BODY:
-                    handleAgentsMovement();
+                    handleAgentsMovement(message.getSender());
                     break;
                     
                 default:
@@ -35,16 +35,16 @@ public class GameLifecycleBehaviour extends CyclicBehaviour
         }
     }
     
-    private void handleAgentsMovement()
+    private void handleAgentsMovement(AID agentAID)
     {
         // Increments the counter of agents that has made their movement
-        ((GameAgent) myAgent).incrementMovedCounter();
+        ((GameAgent) myAgent).addMovedAgent(agentAID);
 
         // Counts the number of agents that has to move
-        int ghosts = ((GameAgent) myAgent).getBoard().getGhosts()
-                        .stream()
-                        .filter(ghost -> ghost.isHouseLeft())
-                        .collect(Collectors.toList()).size();
+        int ghosts = (int) ((GameAgent) myAgent).getBoard().getGhosts()
+                                .stream()
+                                .filter(ghost -> ghost.isHouseLeft())
+                                .count();
         
         // If the counter is equal to the quantity of agents,
         //      notifies the observers and resets the counter
@@ -53,12 +53,12 @@ public class GameLifecycleBehaviour extends CyclicBehaviour
         {
             ((GameAgent) myAgent).getObservers().forEach(observer ->
             {
-                observer.onTurn();
+                observer.onTurnComplete();
             });
             
             System.out.println("Turn is complete...");
             
-            ((GameAgent) myAgent).resetMovedCounter();
+            ((GameAgent) myAgent).resetMoved();
             ((GameAgent) myAgent).setTurnComplete(true);
         }
     }

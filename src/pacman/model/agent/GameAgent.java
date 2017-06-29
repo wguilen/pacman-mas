@@ -1,5 +1,6 @@
 package pacman.model.agent;
 
+import jade.core.AID;
 import jade.core.Agent;
 import jade.wrapper.AgentController;
 import java.io.FileNotFoundException;
@@ -7,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import pacman.model.behaviour.GameGuiBehaviour;
 import pacman.model.behaviour.GameLifecycleBehaviour;
 import pacman.model.behaviour.GameLoadBehaviour;
 import pacman.model.behaviour.GameMovementBehaviour;
@@ -26,16 +28,13 @@ public class GameAgent extends Agent
     private final List<AgentController> ghostsControllers;
     private AgentController pacmanController;
     
-    // Game agents
-    //private final List<GhostAgent> ghosts;
-    
     // Observers
     private final List<GameListener> observers;
     
     // Game control properties
-    private boolean gameRunning;    // TRUE if the game has already started and is running - FALSE otherwise
-    private int movedCounter;       // Tracks the quantity of agents the has done their movement on the board
-    private boolean turnComplete;   // Tracks if a complete turn of the game was made
+    private boolean gameRunning;            // TRUE if the game has already started and is running - FALSE otherwise
+    private final List<AID> movedAgents;    // Tracks the quantity of agents the has done their movement on the board
+    private boolean turnComplete;           // Tracks if a complete turn of the game was made
     
     // --- Ctors
 
@@ -45,13 +44,10 @@ public class GameAgent extends Agent
         ghostsControllers = new ArrayList<>();
         observers = new ArrayList<>();
         
-        // Game agents
-        //ghosts = new ArrayList<>();
-        
         // Inits game control properties
         gameRunning = false;
-        movedCounter = 0;
         turnComplete = true;
+        movedAgents = new ArrayList<>();
     }
     
     
@@ -78,7 +74,7 @@ public class GameAgent extends Agent
     
     public void startGame()
     {
-        //addBehaviour(new GameGuiBehaviour(this));
+        addBehaviour(new GameGuiBehaviour(this));
         addBehaviour(new GameLifecycleBehaviour());
         addBehaviour(new GameMovementBehaviour(this));
         addBehaviour(new GameStartBehaviour(this, board));
@@ -140,17 +136,20 @@ public class GameAgent extends Agent
 
     public int getMovedCounter()
     {
-        return movedCounter;
+        return movedAgents.size();
     }
 
-    public void resetMovedCounter()
+    public void resetMoved()
     {
-        movedCounter = 0;
+        movedAgents.clear();
     }
     
-    public void incrementMovedCounter()
+    public void addMovedAgent(AID agentAID)
     {
-        ++movedCounter;
+        if (!movedAgents.contains(agentAID))
+        {
+            movedAgents.add(agentAID);
+        }
     }
 
     public boolean isTurnComplete()
