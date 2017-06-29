@@ -157,7 +157,7 @@ public class PacmanMovementBehaviour extends SimpleBehaviour
         } while (!cellSelected);
 
         // Effectively makes the movement
-        board.moveCell(myCell, myNewPosition);
+        board.moveCell(myCell, myNewPosition, true);
         moved = true;
         
         // Notifies GameAgent I've made my movement
