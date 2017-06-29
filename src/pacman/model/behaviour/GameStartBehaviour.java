@@ -7,6 +7,7 @@ import jade.lang.acl.ACLMessage;
 import jade.wrapper.StaleProxyException;
 import pacman.model.agent.GameAgent;
 import pacman.model.board.Board;
+import pacman.model.core.Constant;
 import pacman.model.core.GameVocabulary;
 
 public class GameStartBehaviour extends OneShotBehaviour
@@ -23,6 +24,8 @@ public class GameStartBehaviour extends OneShotBehaviour
     @Override
     public void action()
     {
+        try { Thread.sleep(Constant.GAME_START_DELAY); } catch (InterruptedException ex) {}
+        
         System.out.println("On GameStartBehaviour action()...");
         
         // Tells the agents the game is about to start

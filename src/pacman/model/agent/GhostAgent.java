@@ -15,7 +15,7 @@ public class GhostAgent extends Agent
     
     // Game control properties
     private boolean houseLeft;              // TRUE when the ghost has left his house - FALSE otherwise
-    private boolean gameRunning;            // TODO: Quando o Pacman for morto, setar o gameRunning = true (pegar o gameRunning do agente que, por sua vez, receberá do GameAgent através de mensagem)
+    private boolean gameRunning;            // TRUE when the game is running - FALSE otherwise
     private Direction currentDirection;     // Tracks the current direction being followed by the ghost
     private Direction lastDirection;        // Tracks the last direction followed by the ghost (actually, it's currentDirection.getReverse())
     private boolean reverseDirection;       // TRUE if ghost receives "GET_OUT_OF_MY_WAY" from another ghost - FALSE otherwise
@@ -34,7 +34,7 @@ public class GhostAgent extends Agent
         
         // Inits the control properties
         houseLeft = false;
-        gameRunning = true; // TODO: Change this
+        gameRunning = false;
         reverseDirection = false;
         moving = false;
         currentDirection = lastDirection = null;

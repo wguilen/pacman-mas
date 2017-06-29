@@ -36,6 +36,7 @@ public class GhostLifecycleBehaviour extends CyclicBehaviour
                     switch (message.getContent())
                     {
                         case GameVocabulary.START:
+                            ((GhostAgent) myAgent).setGameRunning(true);
                             myAgent.addBehaviour(new GhostLeaveHouseFirstBehaviour(myAgent, board, myCell));
                             break;
                             
