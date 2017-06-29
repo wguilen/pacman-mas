@@ -64,6 +64,8 @@ public class GameLifecycleBehaviour extends CyclicBehaviour
         // The agent has done its movement
         ((GameAgent) myAgent).removeAgentToMove(agentAID);
 
+        System.out.println(((GameAgent) myAgent).isAllAgentsMoved() + " == All agents moved");
+        
         // If all agents has done their movements
         if (((GameAgent) myAgent).isAllAgentsMoved())
         {
