@@ -22,6 +22,7 @@ public class PacmanAgent extends Agent
     private Direction currentDirection;     // Tracks the current direction being followed by Pacman
     private Direction lastDirection;        // Tracks the last direction followed by Pacman (actually, it's currentDirection.getReverse())
     private boolean moving;                 // TRUE if Pacman is moving now - FALSE otherwise
+    private int powerupRemainingTurns;      // Tracks the quantity of turns Pacman still is with a powerup
     
     @Override
     protected void setup()
@@ -38,6 +39,7 @@ public class PacmanAgent extends Agent
         gameRunning = false;
         moving = false;
         currentDirection = lastDirection = null;
+        powerupRemainingTurns = 0;
         
         // Adds its behaviour
         addBehaviour(new PacmanLifecycleBehaviour(this, board, myCell)); // CyclicBehaviour
@@ -53,7 +55,7 @@ public class PacmanAgent extends Agent
     @Override
     protected void takeDown()
     {
-        board.removePacman(myCell);
+        board.removeAgent(myCell);
     }
     
     
@@ -103,8 +105,31 @@ public class PacmanAgent extends Agent
     {
         this.moving = moving;
     }
+
+    public int getPowerupRemainingTurns()
+    {
+        return powerupRemainingTurns;
+    }
+
+    public void setPowerupRemainingTurns(int powerupRemainingTurns)
+    {
+        this.powerupRemainingTurns = powerupRemainingTurns;
+    }
+    
+    public void decreasePowerupRemainingTurns()
+    {
+        powerupRemainingTurns -= (powerupRemainingTurns > 0 ? 1 : 0);
+    }
     
     
+    // --- Public auxiliary methods
+    
+    public boolean isPowerfull()
+    {
+        return powerupRemainingTurns > 0;
+    }
+    
+        
     // --- Overriden public methods
     
     @Override

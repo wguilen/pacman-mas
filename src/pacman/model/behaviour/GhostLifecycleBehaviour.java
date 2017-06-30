@@ -35,19 +35,14 @@ public class GhostLifecycleBehaviour extends CyclicBehaviour
                 case GameVocabulary.ONTOLOGY:
                     switch (message.getContent())
                     {
-                        case GameVocabulary.START:
-                            ((GhostAgent) myAgent).setGameRunning(true);
-                            myAgent.addBehaviour(new GhostLeaveHouseFirstBehaviour(myAgent, board, myCell));
-                            break;
-                            
-                        case GameVocabulary.PAUSE:
-                            ((GhostAgent) myAgent).setGameRunning(false);
-                            break;
-                            
                         case GameVocabulary.CONTINUE:
                             ((GhostAgent) myAgent).setGameRunning(true);
                             break;
-                        
+                            
+                        case GameVocabulary.DIE_NOW:
+                            handleDeath(message);
+                            break;
+                            
                         case GameVocabulary.MOVE_YOUR_BODY:
                             if (!((GhostAgent) myAgent).isMoving())
                             {
@@ -55,6 +50,15 @@ public class GhostLifecycleBehaviour extends CyclicBehaviour
                                 myAgent.addBehaviour(new GhostMovementBehaviour(message, board, myCell));
                             }
                             
+                            break;
+                            
+                        case GameVocabulary.PAUSE:
+                            ((GhostAgent) myAgent).setGameRunning(false);
+                            break;
+                            
+                        case GameVocabulary.START:
+                            ((GhostAgent) myAgent).setGameRunning(true);
+                            myAgent.addBehaviour(new GhostLeaveHouseFirstBehaviour(myAgent, board, myCell));
                             break;
                             
                         default:
@@ -80,6 +84,11 @@ public class GhostLifecycleBehaviour extends CyclicBehaviour
                                     + "Pacman is finally dead!");
                             break;
                             
+                        case GhostVocabulary.THE_MOTHERFUCKER_KILLED_ME:
+                            System.out.println("Oh, no... " + message.getSender().getLocalName() + " was killed by the motherfucker... :(~");
+                            // TODO: Run away from Pacman (if a ghost was killed, it means Pacman is powerful)
+                            break;
+                            
                         default:
                             block();
                     }
@@ -92,6 +101,21 @@ public class GhostLifecycleBehaviour extends CyclicBehaviour
         {
             block();
         }
+    }
+    
+    
+    // --- Private auxiliary methods
+    
+    private void handleDeath(ACLMessage originMessage)
+    {
+        // Confirms the death
+        ACLMessage reply = originMessage.createReply();
+        reply.setPerformative(ACLMessage.CONFIRM);
+        reply.setContent(GameVocabulary.DEATH_CONFIRM);
+        myAgent.send(reply);
+        
+        // Dies
+        myAgent.doDelete();
     }
 
 }

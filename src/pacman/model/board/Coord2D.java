@@ -1,6 +1,8 @@
 package pacman.model.board;
 
-public class Coord2D
+import java.io.Serializable;
+
+public class Coord2D implements Serializable
 {
     
     public final int x;

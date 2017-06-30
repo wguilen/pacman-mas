@@ -140,9 +140,9 @@ public class Board
         return pacman.get(0);
     }
     
-    public synchronized void removePacman(Cell pacmanCell)
+    public synchronized void removeAgent(Cell agentCell)
     {
-        Cell previousCell = getCell(board, pacmanCell.getPosition());
+        Cell previousCell = getCell(board, agentCell.getPosition());
         setCell(previousCell);
     }
     
@@ -161,12 +161,30 @@ public class Board
     
     public synchronized void moveCell(Cell cell, Coord2D destination)
     {
-        // Updates the current cell position to its previous state
+        moveCell(cell, destination, false);
+    }
+    
+    public synchronized void moveCell(Cell cell, Coord2D destination, boolean modifyBoard)
+    {
+        // Gets the cell that was on the current position
         Cell previousCell = getCell(previousBoard, cell.getPosition());
         setCell(previousCell);
         
-        // Snashops the actual board
-        //setCell(previousBoard, cell); TODO: Review this because of the ghost houses on the start of the game
+        // If board should be modified...
+        if (modifyBoard)
+        {
+            // ... and the previous was...
+            switch (previousCell.getType())
+            {
+                // ... a simple or a powerup collectible, removes it
+                case DOT:
+                case POWERUP:
+                    Cell emptyCell = new Cell(previousCell.getPosition(), CellType.EMPTY);
+                    setCell(emptyCell);
+                    setCell(previousBoard, emptyCell);
+                    break;
+            }
+        }
         
         // Updates the new cell with its destination
         cell.setPosition(destination);

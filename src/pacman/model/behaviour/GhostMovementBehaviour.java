@@ -1,7 +1,5 @@
 package pacman.model.behaviour;
 
-import jade.core.AID;
-import jade.core.behaviours.SimpleBehaviour;
 import jade.lang.acl.ACLMessage;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,31 +11,22 @@ import pacman.model.board.CellType;
 import pacman.model.board.Coord2D;
 import pacman.model.board.Direction;
 import pacman.model.board.GhostCell;
-import pacman.model.board.PacmanCell;
 import pacman.model.core.Constant;
 import pacman.model.core.GameVocabulary;
 import pacman.model.core.GhostVocabulary;
 
-public class GhostMovementBehaviour extends SimpleBehaviour
+public class GhostMovementBehaviour extends BaseMovementBehaviour
 {
-
-    private final Board board;
-    private final Cell myCell;
-    private final ACLMessage originMessage;
 
     // Control properties
     private boolean reverse;    // Tracks if the agent should reverse his direction if another ghost is going in the same direction and is near
-    private boolean moved;      // Tracks if the ghost has done its movement
 
     public GhostMovementBehaviour(ACLMessage originMessage, Board board, Cell myCell)
     {
-        this.board = board;
-        this.myCell = myCell;
-        this.originMessage = originMessage;
+        super(originMessage, board, myCell);
 
         // Inits the game control properties
         reverse = false;
-        moved = false;
     }
 
     @Override
@@ -74,12 +63,6 @@ public class GhostMovementBehaviour extends SimpleBehaviour
             move();                 // Ghost makes a movement
             checkGhostOnSamePath(); // Ghost checks if are there another ghosts on the same path
         }
-    }
-
-    @Override
-    public boolean done()
-    {
-        return moved;
     }
 
     private void move()
@@ -173,8 +156,8 @@ public class GhostMovementBehaviour extends SimpleBehaviour
             }
         } while (!cellSelected);
 
-        // Checks if the ghost is about the kill Pacman
-        checkPacmanHomicide(nearCell);
+        // Handles possible collision with Pacman
+        handlePacmanCollision(nearCell);
             
         // Effectively makes the movement
         board.moveCell(myCell, myNewPosition);
@@ -190,35 +173,6 @@ public class GhostMovementBehaviour extends SimpleBehaviour
         ((GhostAgent) myAgent).setMoving(false);
     }
     
-    private void checkPacmanHomicide(Cell cell)
-    {
-        if (cell instanceof PacmanCell)
-        {
-            // Notifies GameAgent so the game ends
-            ACLMessage message = new ACLMessage(ACLMessage.INFORM);
-            message.setOntology(GameVocabulary.ONTOLOGY);
-            message.setContent(GameVocabulary.END);
-            message.addReceiver(new AID(Constant.GAME_AGENT_NAME, AID.ISLOCALNAME));
-            myAgent.send(message);
-            
-            // Notifies other ghosts so they can celebrate
-            message.clearAllReceiver();
-            message.setOntology(GhostVocabulary.ONTOLOGY);
-            message.setContent(GhostVocabulary.THE_MOTHERFUCKER_IS_DEAD);
-            board.getGhosts()
-                    .stream()
-                    .filter(ghost -> !ghost.equals(((GhostAgent) myAgent)))
-                    .forEach(ghost -> message.addReceiver(ghost.getAID()));
-            myAgent.send(message);
-            
-            // Notifies Pacman
-            message.clearAllReceiver();
-            message.setContent(GhostVocabulary.I_KILLED_YOU);
-            message.addReceiver(board.getPacman().getAID());
-            myAgent.send(message);
-        }
-    }
-
     private void checkGhostOnSamePath()
     {        
         List<GhostAgent> ghosts = new ArrayList<>();
@@ -371,39 +325,11 @@ public class GhostMovementBehaviour extends SimpleBehaviour
         }
     }
 
-    private boolean isValidDestination(Cell cell)
+    @Override
+    protected boolean isValidDestination(Cell cell)
     {
-        return CellType.DOOR != cell.getType()              // Cannot run to a door
-               && CellType.GHOST_HOUSE != cell.getType()    // Neither to a ghost house
-               && CellType.GHOST != cell.getType()          // Neither to another ghost
-                && CellType.WALL != cell.getType();         // Neither to a wall
-    }
-
-    private Coord2D getNewPosition(Coord2D currentPosition, Direction destination)
-    {
-        Coord2D newPosition = new Coord2D(currentPosition.x + destination.xInc, currentPosition.y + destination.yInc);
-
-        // Validates x position
-        if (newPosition.x < 0)
-        {
-            newPosition = new Coord2D(board.countRows() - 1, newPosition.y);
-        } 
-        else if (newPosition.x > board.countRows() - 1)
-        {
-            newPosition = new Coord2D(0, newPosition.y);
-        }
-
-        // Validates y position        
-        if (newPosition.y < 0)
-        {
-            newPosition = new Coord2D(newPosition.x, board.countColumns() - 1);
-        } 
-        else if (newPosition.y > board.countColumns() - 1)
-        {
-            newPosition = new Coord2D(newPosition.x, 0);
-        }
-
-        return newPosition;
+        return super.isValidDestination(cell)       // Cannot run to a door, ghost house or wall
+               && CellType.GHOST != cell.getType(); // Neither to another ghost
     }
 
     private void maybeReverseDirection()
@@ -421,22 +347,26 @@ public class GhostMovementBehaviour extends SimpleBehaviour
     }
 
     // --- Getters and setters
-    private Direction getCurrentDirection()
+    @Override
+    protected Direction getCurrentDirection()
     {
         return ((GhostAgent) myAgent).getCurrentDirection();
     }
 
-    private void setCurrentDirection(Direction direction)
+    @Override
+    protected void setCurrentDirection(Direction direction)
     {
         ((GhostAgent) myAgent).setCurrentDirection(direction);
     }
 
-    private Direction getLastDirection()
+    @Override
+    protected Direction getLastDirection()
     {
         return ((GhostAgent) myAgent).getLastDirection();
     }
 
-    private void setLastDirection(Direction direction)
+    @Override
+    protected void setLastDirection(Direction direction)
     {
         ((GhostAgent) myAgent).setLastDirection(direction);
     }
