@@ -56,6 +56,7 @@ public class PacmanAgent extends Agent
     protected void takeDown()
     {
         board.removeAgent(myCell);
+        System.out.println(getLocalName() + ": Goodbye, cruel world...");
     }
     
     
