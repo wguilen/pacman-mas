@@ -52,7 +52,7 @@ public class PacmanMovementBehaviour extends BaseMovementBehaviour
 
         Coord2D myPosition = myCell.getPosition();
         Coord2D myNewPosition = null;
-        Cell nearCell;
+        Cell nearCell = null;
 
         // Control variable used for letting Pacman reverse his way, 
         //      if it gets stuck
@@ -136,7 +136,10 @@ public class PacmanMovementBehaviour extends BaseMovementBehaviour
                 }
             }
         } while (!cellSelected);
-
+        
+        // Handles powerups
+        handlePowerup(nearCell);
+        
         // Effectively makes the movement
         board.moveCell(myCell, myNewPosition, true);
         moved = true;
@@ -156,6 +159,27 @@ public class PacmanMovementBehaviour extends BaseMovementBehaviour
     {
         return super.isValidDestination(cell)       // Cannot run to a door, ghost house or wall
                && CellType.GHOST != cell.getType(); // Neither to another ghost // TODO: Remove this and treat
+    }
+    
+    
+    // --- Private auxiliary methods
+    
+    private void handlePowerup(Cell cell)
+    {
+        // First, decreases a turn from Pacman's powerup
+        ((PacmanAgent) myAgent).decreasePowerupRemainingTurns();
+                
+        // Then, checks if he got another powerup
+        if (null == cell || 
+                !cell.getType().equals(CellType.POWERUP))
+        {
+            return;
+        }
+        
+        int currentPowerupTurns = ((PacmanAgent) myAgent).getPowerupRemainingTurns();
+        ((PacmanAgent) myAgent).setPowerupRemainingTurns(currentPowerupTurns + Constant.PACMAN_POWERUP_TURNS);
+        
+        System.out.println("Powerup state is " + ((PacmanAgent) myAgent).getPowerupRemainingTurns());
     }
 
     

@@ -176,8 +176,9 @@ public class Board
             // ... and the previous was...
             switch (previousCell.getType())
             {
-                // ... a simple collectible, removes it
+                // ... a simple or a powerup collectible, removes it
                 case DOT:
+                case POWERUP:
                     Cell emptyCell = new Cell(previousCell.getPosition(), CellType.EMPTY);
                     setCell(emptyCell);
                     setCell(previousBoard, emptyCell);
