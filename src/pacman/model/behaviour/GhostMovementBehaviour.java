@@ -1,6 +1,5 @@
 package pacman.model.behaviour;
 
-import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +11,6 @@ import pacman.model.board.CellType;
 import pacman.model.board.Coord2D;
 import pacman.model.board.Direction;
 import pacman.model.board.GhostCell;
-import pacman.model.board.PacmanCell;
 import pacman.model.core.Constant;
 import pacman.model.core.GameVocabulary;
 import pacman.model.core.GhostVocabulary;
@@ -158,8 +156,8 @@ public class GhostMovementBehaviour extends BaseMovementBehaviour
             }
         } while (!cellSelected);
 
-        // Checks if the ghost is about the kill Pacman
-        checkPacmanHomicide(nearCell);
+        // Handles possible collision with Pacman
+        handlePacmanCollision(nearCell);
             
         // Effectively makes the movement
         board.moveCell(myCell, myNewPosition);
@@ -175,35 +173,6 @@ public class GhostMovementBehaviour extends BaseMovementBehaviour
         ((GhostAgent) myAgent).setMoving(false);
     }
     
-    private void checkPacmanHomicide(Cell cell)
-    {
-        if (cell instanceof PacmanCell)
-        {
-            // Notifies GameAgent so the game ends
-            ACLMessage message = new ACLMessage(ACLMessage.INFORM);
-            message.setOntology(GameVocabulary.ONTOLOGY);
-            message.setContent(GameVocabulary.END);
-            message.addReceiver(new AID(Constant.GAME_AGENT_NAME, AID.ISLOCALNAME));
-            myAgent.send(message);
-            
-            // Notifies other ghosts so they can celebrate
-            message.clearAllReceiver();
-            message.setOntology(GhostVocabulary.ONTOLOGY);
-            message.setContent(GhostVocabulary.THE_MOTHERFUCKER_IS_DEAD);
-            board.getGhosts()
-                    .stream()
-                    .filter(ghost -> !ghost.equals(((GhostAgent) myAgent)))
-                    .forEach(ghost -> message.addReceiver(ghost.getAID()));
-            myAgent.send(message);
-            
-            // Notifies Pacman
-            message.clearAllReceiver();
-            message.setContent(GhostVocabulary.I_KILLED_YOU);
-            message.addReceiver(board.getPacman().getAID());
-            myAgent.send(message);
-        }
-    }
-
     private void checkGhostOnSamePath()
     {        
         List<GhostAgent> ghosts = new ArrayList<>();

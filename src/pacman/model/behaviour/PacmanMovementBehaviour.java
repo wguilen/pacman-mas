@@ -24,8 +24,8 @@ public class PacmanMovementBehaviour extends BaseMovementBehaviour
     {
         // If the game is not running or Pacman still didn't 
         //      left his house, doesn't move
-        if (!(                                              // If not
-                ((PacmanAgent) myAgent).isGameRunning()      // ... game is running
+        if (!(                                          // If not
+                ((PacmanAgent) myAgent).isGameRunning() // ... game is running
            ))
         {
             // Replies to the Game Agent denying this behaviour
@@ -137,6 +137,9 @@ public class PacmanMovementBehaviour extends BaseMovementBehaviour
             }
         } while (!cellSelected);
         
+        // Handles possible collision with a ghost
+        handlePacmanCollision(nearCell);
+        
         // Handles powerups
         handlePowerup(nearCell);
         
@@ -168,6 +171,8 @@ public class PacmanMovementBehaviour extends BaseMovementBehaviour
     {
         // First, decreases a turn from Pacman's powerup
         ((PacmanAgent) myAgent).decreasePowerupRemainingTurns();
+        
+        System.out.println("Powerup state is " + ((PacmanAgent) myAgent).getPowerupRemainingTurns());
                 
         // Then, checks if he got another powerup
         if (null == cell || 
@@ -178,8 +183,6 @@ public class PacmanMovementBehaviour extends BaseMovementBehaviour
         
         int currentPowerupTurns = ((PacmanAgent) myAgent).getPowerupRemainingTurns();
         ((PacmanAgent) myAgent).setPowerupRemainingTurns(currentPowerupTurns + Constant.PACMAN_POWERUP_TURNS);
-        
-        System.out.println("Powerup state is " + ((PacmanAgent) myAgent).getPowerupRemainingTurns());
     }
 
     

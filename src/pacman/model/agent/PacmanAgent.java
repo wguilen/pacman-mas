@@ -55,7 +55,7 @@ public class PacmanAgent extends Agent
     @Override
     protected void takeDown()
     {
-        board.removePacman(myCell);
+        board.removeAgent(myCell);
     }
     
     
@@ -128,7 +128,6 @@ public class PacmanAgent extends Agent
     {
         return powerupRemainingTurns > 0;
     }
-    
     
         
     // --- Overriden public methods

@@ -24,6 +24,7 @@ public class GhostAgent extends Agent
     private Direction lastDirection;        // Tracks the last direction followed by the ghost (actually, it's currentDirection.getReverse())
     private boolean reverseDirection;       // TRUE if ghost receives "GET_OUT_OF_MY_WAY" from another ghost - FALSE otherwise
     private boolean moving;                 // TRUE if the ghost is moving now - FALSE otherwise
+    private boolean shouldDie;              // TRUE if the ghost was caught by Pacman - FALSE otherwise
     
     @Override
     protected void setup()
@@ -41,6 +42,7 @@ public class GhostAgent extends Agent
         gameRunning = false;
         reverseDirection = false;
         moving = false;
+        shouldDie = false;
         currentDirection = lastDirection = null;
         
         // Adds its behaviour
@@ -54,6 +56,12 @@ public class GhostAgent extends Agent
         send(message);
     }
 
+    @Override
+    protected void takeDown()
+    {
+        board.removeAgent(myCell);
+        System.out.println(getLocalName() + ": Goodbye, cruel world...");
+    }
     
     // --- Getters and setters
     
@@ -120,6 +128,16 @@ public class GhostAgent extends Agent
     public void setMoving(boolean moving)
     {
         this.moving = moving;
+    }
+
+    public boolean isShouldDie()
+    {
+        return shouldDie;
+    }
+
+    public void setShouldDie(boolean shouldDie)
+    {
+        this.shouldDie = shouldDie;
     }
     
     

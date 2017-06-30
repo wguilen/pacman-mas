@@ -140,9 +140,9 @@ public class Board
         return pacman.get(0);
     }
     
-    public synchronized void removePacman(Cell pacmanCell)
+    public synchronized void removeAgent(Cell agentCell)
     {
-        Cell previousCell = getCell(board, pacmanCell.getPosition());
+        Cell previousCell = getCell(board, agentCell.getPosition());
         setCell(previousCell);
     }
     

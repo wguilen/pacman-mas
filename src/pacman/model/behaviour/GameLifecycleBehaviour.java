@@ -35,6 +35,10 @@ public class GameLifecycleBehaviour extends CyclicBehaviour
             
             switch (message.getContent())
             {
+                case GameVocabulary.DEATH_CONFIRM:
+                    handleDeathConfirmation(message.getSender());
+                    break;
+                    
                 case GameVocabulary.AGENT_INITIALIZED:
                     handleAgentInitialized();
                     break;
@@ -60,6 +64,13 @@ public class GameLifecycleBehaviour extends CyclicBehaviour
     
     
     // --- Private auxiliary methods
+    
+    // This method is called only when a ghost dies
+    private void handleDeathConfirmation(AID agentAID)
+    {
+        // The agent won't move anymore (it's dead!)
+        ((GameAgent) myAgent).removeAgentToMove(agentAID);
+    }
     
     private void handleAgentInitialized()
     {
