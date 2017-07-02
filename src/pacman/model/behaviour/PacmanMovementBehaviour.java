@@ -1,5 +1,6 @@
 package pacman.model.behaviour;
 
+import jade.core.AID;
 import jade.lang.acl.ACLMessage;
 import java.util.concurrent.ThreadLocalRandom;
 import pacman.model.agent.PacmanAgent;
@@ -143,6 +144,9 @@ public class PacmanMovementBehaviour extends BaseMovementBehaviour
         // Handles powerups
         handlePowerup(nearCell);
         
+        // Handles game ends (in the case Pacman won it)
+        handleGameEnd();
+        
         // Effectively makes the movement
         board.moveCell(myCell, myNewPosition, true);
         moved = true;
@@ -157,6 +161,28 @@ public class PacmanMovementBehaviour extends BaseMovementBehaviour
         ((PacmanAgent) myAgent).setMoving(false);
     }
 
+    private void handleGameEnd()
+    {
+        // If the game still has remaining ghosts and collectibles,
+        //  Pacman still didn't won the game
+        int remainingGhosts = (int) board.getGhosts()
+                                        .stream()
+                                        .filter(ghost -> !ghost.isShouldDie())
+                                        .count();
+        
+        if (0 < remainingGhosts && board.hasRemainingCollectibles())
+        {
+            return;
+        }
+
+        // Else, informs Game agent the game has been won (and should end)
+        ACLMessage message = new ACLMessage(ACLMessage.INFORM);
+        message.setOntology(GameVocabulary.ONTOLOGY);
+        message.setContent(GameVocabulary.END_PACMAN_WINS);
+        message.addReceiver(new AID(Constant.GAME_AGENT_NAME, AID.ISLOCALNAME));
+        myAgent.send(message);
+    }
+    
     @Override
     protected boolean isValidDestination(Cell cell)
     {

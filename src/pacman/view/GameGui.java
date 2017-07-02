@@ -26,6 +26,9 @@ public class GameGui extends JFrame implements GameListener
         initListeners();
     }
     
+    
+    // --- Private auxiliary methods
+    
     private void init()
     {
         setResizable(false);
@@ -71,6 +74,22 @@ public class GameGui extends JFrame implements GameListener
             
         });
     }
+    
+    private void handleQuit(String message, String title)
+    {
+        int ret = JOptionPane.showConfirmDialog(
+                        this, 
+                        message + "\nQuit now?", 
+                        title, 
+                        JOptionPane.YES_NO_OPTION, 
+                        JOptionPane.INFORMATION_MESSAGE
+        );
+        
+        if (JOptionPane.YES_OPTION == ret)
+        {
+            myAgent.doDelete();
+        }
+    }
 
     
     // --- Component
@@ -85,10 +104,24 @@ public class GameGui extends JFrame implements GameListener
     
     // --- GameListener
     
+    
+    @Override
+    public void dispose()
+    {
+        System.out.println("Finishing GameGUI...");
+        System.exit(0);
+    }
+
     @Override
     public void onAgentInitialized()
     {
         repaint();
+    }
+    
+    @Override
+    public void onGameWonByPacman()
+    {
+        handleQuit("Pacman won the game!", "End game");
     }
     
     @Override
@@ -100,7 +133,7 @@ public class GameGui extends JFrame implements GameListener
     @Override
     public void onPacmanKilled(String killer)
     {
-        JOptionPane.showMessageDialog(this, "Pacman was killed by " + killer + "!", "End game", JOptionPane.INFORMATION_MESSAGE);
+        handleQuit("Pacman was killed by " + killer + "!", "End game");
     }
 
     @Override

@@ -43,9 +43,13 @@ public class GameLifecycleBehaviour extends CyclicBehaviour
                     handleAgentInitialized();
                     break;
                 
-                case GameVocabulary.END:
+                case GameVocabulary.END_GHOSTS_WIN:
                     ((GameAgent) myAgent).setGameEnded(true);
                     pacmanKiller = message.getSender().getLocalName();
+                    break;
+                    
+                case GameVocabulary.END_PACMAN_WINS:
+                    ((GameAgent) myAgent).setGameEnded(true);
                     break;
                     
                 case GameVocabulary.MOVED_MY_BODY:
@@ -111,8 +115,19 @@ public class GameLifecycleBehaviour extends CyclicBehaviour
             if (((GameAgent) myAgent).isGameEnded())
             {
                 ((GameAgent) myAgent).setGameRunning(false);
-                ((GameAgent) myAgent).getObservers()
-                        .forEach(observer -> observer.onPacmanKilled(pacmanKiller));
+                
+                // Pacman won the game
+                if (null == pacmanKiller)
+                {
+                    ((GameAgent) myAgent).getObservers()
+                            .forEach(observer -> observer.onGameWonByPacman());
+                }
+                // Ghosts won the game
+                else
+                {
+                    ((GameAgent) myAgent).getObservers()
+                            .forEach(observer -> observer.onPacmanKilled(pacmanKiller));
+                }
             }
         }
         

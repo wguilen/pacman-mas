@@ -59,8 +59,10 @@ public class GhostAgent extends Agent
     @Override
     protected void takeDown()
     {
-        board.removeAgent(myCell);
+        board.removeAgentCell(myCell);
         System.out.println(getLocalName() + ": Goodbye, cruel world...");
+        
+        super.takeDown();
     }
     
     // --- Getters and setters

@@ -1,6 +1,8 @@
 package pacman.model.board;
 
+import java.awt.Graphics2D;
 import pacman.model.agent.PacmanAgent;
+import pacman.model.core.Constant;
 
 public class PacmanCell extends Cell
 {
@@ -26,6 +28,26 @@ public class PacmanCell extends Cell
     public PacmanAgent getAgent()
     {
         return agent;
+    }
+
+    
+    // --- Public overriden methods
+    
+    @Override
+    public void draw(Graphics2D canvas)
+    {
+        int x = getPosition().x,
+            y = getPosition().y;
+                
+        canvas.setColor(!agent.isPowerfull() ? 
+                getType().getColor() : CellType.POWERUP.getColor());
+        
+        canvas.fillOval(
+            Constant.BOARD_CELL_SIZE * y,
+            Constant.BOARD_CELL_SIZE * x, 
+            Constant.BOARD_CELL_SIZE, 
+            Constant.BOARD_CELL_SIZE    
+        );
     }
     
 }
