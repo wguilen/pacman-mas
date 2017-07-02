@@ -140,7 +140,7 @@ public class Board
         return pacman.get(0);
     }
     
-    public synchronized void removeAgent(Cell agentCell)
+    public synchronized void removeAgentCell(Cell agentCell)
     {
         Cell previousCell = getCell(board, agentCell.getPosition());
         setCell(previousCell);
@@ -199,6 +199,31 @@ public class Board
     public synchronized int countColumns()
     {
         return board.get(0).size();
+    }
+    
+    public boolean hasRemainingCollectibles()
+    {
+        List<Cell> collectibles = new ArrayList<>();
+        
+        board.forEach(row ->
+        {
+            if (!collectibles.isEmpty())
+            {
+                return;
+            }
+            
+            Optional<Cell> optCell = row
+                                        .stream()
+                                        .filter(cell -> (cell.getType().equals(CellType.DOT) || cell.getType().equals(CellType.POWERUP)))
+                                        .findAny();
+            
+            if (optCell.isPresent())
+            {
+                collectibles.add(optCell.get());
+            }
+        });
+        
+        return !collectibles.isEmpty();
     }
     
     public synchronized void print()

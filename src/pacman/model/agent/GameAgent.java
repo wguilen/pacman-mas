@@ -3,6 +3,7 @@ package pacman.model.agent;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.wrapper.AgentController;
+import jade.wrapper.StaleProxyException;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
@@ -75,6 +76,31 @@ public class GameAgent extends Agent
         addObserver(myGui);
     }
 
+    @Override
+    protected void takeDown()
+    {
+        // Kills remaining ghosts
+        ghostsControllers.forEach(ghostController ->
+        {
+            try
+            {
+                ghostController.kill();
+            } 
+            catch (StaleProxyException ex) {}
+        });
+        
+        // Kills Pacman
+        try
+        {
+            pacmanController.kill();
+        } 
+        catch (StaleProxyException ex) {}
+        
+        // Ends the game
+        System.out.println("Game agent is dead...");        
+        ((GameListener) myGui).dispose();
+    }
+    
     
     // --- Public methods
     

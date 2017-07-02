@@ -109,7 +109,7 @@ public abstract class BaseMovementBehaviour extends SimpleBehaviour
                 // Notifies GameAgent so the game ends
                 ACLMessage message = new ACLMessage(ACLMessage.INFORM);
                 message.setOntology(GameVocabulary.ONTOLOGY);
-                message.setContent(GameVocabulary.END);
+                message.setContent(GameVocabulary.END_GHOSTS_WIN);
                 message.addReceiver(new AID(Constant.GAME_AGENT_NAME, AID.ISLOCALNAME));
                 myAgent.send(message);
 

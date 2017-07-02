@@ -39,7 +39,7 @@ public class PacmanAgent extends Agent
         gameRunning = false;
         moving = false;
         currentDirection = lastDirection = null;
-        powerupRemainingTurns = 0;
+        powerupRemainingTurns = 100000;
         
         // Adds its behaviour
         addBehaviour(new PacmanLifecycleBehaviour(this, board, myCell)); // CyclicBehaviour
@@ -55,8 +55,10 @@ public class PacmanAgent extends Agent
     @Override
     protected void takeDown()
     {
-        board.removeAgent(myCell);
+        board.removeAgentCell(myCell);
         System.out.println(getLocalName() + ": Goodbye, cruel world...");
+        
+        super.takeDown();
     }
     
     
