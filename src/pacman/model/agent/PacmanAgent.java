@@ -39,7 +39,7 @@ public class PacmanAgent extends Agent
         gameRunning = false;
         moving = false;
         currentDirection = lastDirection = null;
-        powerupRemainingTurns = 100000;
+        powerupRemainingTurns = 0;
         
         // Adds its behaviour
         addBehaviour(new PacmanLifecycleBehaviour(this, board, myCell)); // CyclicBehaviour
