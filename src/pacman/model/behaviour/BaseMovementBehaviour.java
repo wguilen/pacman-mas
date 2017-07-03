@@ -77,31 +77,16 @@ public abstract class BaseMovementBehaviour extends SimpleBehaviour
     
     protected void handlePacmanCollision(Cell cell)
     {
-        if (!(cell instanceof PacmanCell))
-        {
-            return;
-        }
-        
         // Ghost found Pacman
-        if (myAgent instanceof GhostAgent)
+        if (myAgent instanceof GhostAgent 
+                && cell instanceof PacmanCell)
         {
             PacmanAgent pacman = ((PacmanCell) cell).getAgent();
 
             // Ghost dies
             if (pacman.isPowerfull())
             {
-                // Notifies other ghosts so they can run
-                ACLMessage message = new ACLMessage(ACLMessage.INFORM);
-                message.setOntology(GhostVocabulary.ONTOLOGY);
-                message.setContent(GhostVocabulary.THE_MOTHERFUCKER_KILLED_ME);
-                board.getGhosts()
-                        .stream()
-                        .filter(ghost -> !ghost.equals(((GhostAgent) myAgent)))
-                        .forEach(ghost -> message.addReceiver(ghost.getAID()));
-                myAgent.send(message);
-
-                // Marks the ghost for dying
-                ((GhostAgent) myAgent).setShouldDie(true);
+                ((GhostAgent) myAgent).die();
             }
             // Pacman dies
             else
@@ -131,9 +116,10 @@ public abstract class BaseMovementBehaviour extends SimpleBehaviour
             }
         }
         // Pacman found ghost
-        /*else if (myAgent instanceof PacmanAgent)
+        /*else if (myAgent instanceof PacmanAgent 
+                && cell instanceof GhostCell)
         {
-            System.out.println("Pacman found a ghost!");
+            System.out.println("Pacman found a ghoooooooooooooooost!");
         }*/
     }
 

@@ -35,10 +35,6 @@ public class GameLifecycleBehaviour extends CyclicBehaviour
             
             switch (message.getContent())
             {
-                case GameVocabulary.DEATH_CONFIRM:
-                    handleDeathConfirmation(message.getSender());
-                    break;
-                    
                 case GameVocabulary.AGENT_INITIALIZED:
                     handleAgentInitialized();
                     break;
@@ -50,6 +46,10 @@ public class GameLifecycleBehaviour extends CyclicBehaviour
                     
                 case GameVocabulary.END_PACMAN_WINS:
                     ((GameAgent) myAgent).setGameEnded(true);
+                    break;
+                    
+                case GameVocabulary.GHOST_KILLED:
+                    handleDeathConfirmation(message.getSender());
                     break;
                     
                 case GameVocabulary.MOVED_MY_BODY:
@@ -72,8 +72,7 @@ public class GameLifecycleBehaviour extends CyclicBehaviour
     // This method is called only when a ghost dies
     private void handleDeathConfirmation(AID agentAID)
     {
-        // The agent won't move anymore (it's dead!)
-        ((GameAgent) myAgent).removeAgentToMove(agentAID);
+        handleAgentMovement(agentAID);
     }
     
     private void handleAgentInitialized()

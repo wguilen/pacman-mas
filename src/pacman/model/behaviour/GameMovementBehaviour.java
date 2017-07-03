@@ -29,8 +29,6 @@ public class GameMovementBehaviour extends TickerBehaviour
             return;
         }
 
-        handleGhostDeath();
-        
         if (((GameAgent) myAgent).isGameEnded())
         {
             myAgent.removeBehaviour(this);
@@ -42,21 +40,6 @@ public class GameMovementBehaviour extends TickerBehaviour
     
     
     // --- Private auxiliary methods
-    
-    private void handleGhostDeath()
-    {
-        List<GhostAgent> ghosts = ((GameAgent) myAgent).getBoard().getGhosts()
-                                    .stream()
-                                    .filter(ghost -> ghost.isShouldDie())
-                                    .collect(Collectors.toList());
-        
-        // Orders the ghosts to die
-        ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
-        message.setOntology(GameVocabulary.ONTOLOGY);
-        message.setContent(GameVocabulary.DIE_NOW);
-        ghosts.forEach(ghost -> message.addReceiver(ghost.getAID()));
-        myAgent.send(message);
-    }
     
     private void sendMoveOrder()
     {

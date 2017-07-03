@@ -163,11 +163,14 @@ public class GhostMovementBehaviour extends BaseMovementBehaviour
         board.moveCell(myCell, myNewPosition);
         moved = true;
         
-        // Notifies GameAgent I've made my movement
-        ACLMessage reply = originMessage.createReply();
-        reply.setPerformative(ACLMessage.CONFIRM);
-        reply.setContent(GameVocabulary.MOVED_MY_BODY);
-        myAgent.send(reply);
+        if (!((GhostAgent) myAgent).isShouldDie())
+        {
+            // Notifies GameAgent I've made my movement
+            ACLMessage reply = originMessage.createReply();
+            reply.setPerformative(ACLMessage.CONFIRM);
+            reply.setContent(GameVocabulary.MOVED_MY_BODY);
+            myAgent.send(reply);
+        }
         
         // Updates the GhostAgent state
         ((GhostAgent) myAgent).setMoving(false);
