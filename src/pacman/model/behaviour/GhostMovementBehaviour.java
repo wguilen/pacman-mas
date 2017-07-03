@@ -32,11 +32,12 @@ public class GhostMovementBehaviour extends BaseMovementBehaviour
     @Override
     public void action()
     {
-        // If the game is not running or the ghost still didn't 
-        //      left his house, doesn't move
+        // If the game is not running, the ghost still didn't 
+        //      left his house or it's marked for death, doesn't move
         if (!(                                              // If not
                 ((GhostAgent) myAgent).isGameRunning()      // ... game is running
                 && ((GhostAgent) myAgent).isHouseLeft()     // ... the ghost left its house
+                && !((GhostAgent) myAgent).isShouldDie()    // ... the ghost is not marked for death
            ))
         {
             // Replies to the Game Agent denying this behaviour
@@ -163,11 +164,14 @@ public class GhostMovementBehaviour extends BaseMovementBehaviour
         board.moveCell(myCell, myNewPosition);
         moved = true;
         
-        // Notifies GameAgent I've made my movement
-        ACLMessage reply = originMessage.createReply();
-        reply.setPerformative(ACLMessage.CONFIRM);
-        reply.setContent(GameVocabulary.MOVED_MY_BODY);
-        myAgent.send(reply);
+        if (!((GhostAgent) myAgent).isShouldDie())
+        {
+            // Notifies GameAgent I've made my movement
+            ACLMessage reply = originMessage.createReply();
+            reply.setPerformative(ACLMessage.CONFIRM);
+            reply.setContent(GameVocabulary.MOVED_MY_BODY);
+            myAgent.send(reply);
+        }
         
         // Updates the GhostAgent state
         ((GhostAgent) myAgent).setMoving(false);

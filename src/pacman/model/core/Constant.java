@@ -10,7 +10,7 @@ public class Constant
     public static final int BOARD_CELL_SIZE                         = 30;       // Squarred size of each cell in the GUI
     
     // Entities general
-    public static final int MOVEMENT_DELAY                          = 400;      // Delay (in milliseconds) for each movement from ghosts and pacman
+    public static final int MOVEMENT_DELAY                          = 120;      // Delay (in milliseconds) for each movement from ghosts and pacman
     
     // Game agent
     public static final String GAME_AGENT_NAME                      = "Game";   // Game agent name
@@ -18,7 +18,7 @@ public class Constant
 
     // Pacman agent
     public static final float PACMAN_TURN_ON_BIFURCATION_CHANCE     = 0.3f;     // Chance of Pacman to turn on bifurcation when one is found in his continous path
-    public static final int PACMAN_POWERUP_TURNS                    = 30;       // Number of turns Pacman must have a powerful state after collecting a powerup
+    public static final int PACMAN_POWERUP_TURNS                    = 60;       // Number of turns Pacman must have a powerful state after collecting a powerup
     
     // Ghosts agents
     public static final int GHOST_LEAVE_HOUSE_DELAY                 = 2500;     // Delay (in milliseconds) for each ghost leaving the house

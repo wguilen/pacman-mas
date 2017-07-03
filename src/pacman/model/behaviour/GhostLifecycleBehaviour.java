@@ -39,10 +39,6 @@ public class GhostLifecycleBehaviour extends CyclicBehaviour
                             ((GhostAgent) myAgent).setGameRunning(true);
                             break;
                             
-                        case GameVocabulary.DIE_NOW:
-                            handleDeath(message);
-                            break;
-                            
                         case GameVocabulary.MOVE_YOUR_BODY:
                             if (!((GhostAgent) myAgent).isMoving())
                             {
@@ -101,21 +97,6 @@ public class GhostLifecycleBehaviour extends CyclicBehaviour
         {
             block();
         }
-    }
-    
-    
-    // --- Private auxiliary methods
-    
-    private void handleDeath(ACLMessage originMessage)
-    {
-        // Confirms the death
-        ACLMessage reply = originMessage.createReply();
-        reply.setPerformative(ACLMessage.CONFIRM);
-        reply.setContent(GameVocabulary.DEATH_CONFIRM);
-        myAgent.send(reply);
-        
-        // Dies
-        myAgent.doDelete();
     }
 
 }

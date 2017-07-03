@@ -10,15 +10,11 @@ import pacman.model.core.GameVocabulary;
 public class GameLifecycleBehaviour extends CyclicBehaviour
 {
 
-    // Game control properties
-    private String pacmanKiller;
+    private boolean pacmanWins;
 
-    
-    // --- Ctors
-    
     public GameLifecycleBehaviour()
     {
-        pacmanKiller = null;
+        pacmanWins = false;
     }
     
     
@@ -35,25 +31,27 @@ public class GameLifecycleBehaviour extends CyclicBehaviour
             
             switch (message.getContent())
             {
-                case GameVocabulary.DEATH_CONFIRM:
-                    handleDeathConfirmation(message.getSender());
-                    break;
-                    
                 case GameVocabulary.AGENT_INITIALIZED:
                     handleAgentInitialized();
                     break;
                 
-                case GameVocabulary.END_GHOSTS_WIN:
+                case GameVocabulary.END_PACMAN_WINS:
+                    pacmanWins = true;
                     ((GameAgent) myAgent).setGameEnded(true);
-                    pacmanKiller = message.getSender().getLocalName();
                     break;
                     
-                case GameVocabulary.END_PACMAN_WINS:
-                    ((GameAgent) myAgent).setGameEnded(true);
+                case GameVocabulary.GHOST_KILLED:
+                    handleAgentKilled(message.getSender());
                     break;
                     
                 case GameVocabulary.MOVED_MY_BODY:
                     handleAgentMovement(message.getSender());
+                    break;
+                    
+                case GameVocabulary.PACMAN_KILLED:
+                    pacmanWins = false;
+                    ((GameAgent) myAgent).setGameEnded(true);
+                    //handleAgentKilled(message.getSender());
                     break;
                     
                 default:
@@ -69,11 +67,9 @@ public class GameLifecycleBehaviour extends CyclicBehaviour
     
     // --- Private auxiliary methods
     
-    // This method is called only when a ghost dies
-    private void handleDeathConfirmation(AID agentAID)
+    private void handleAgentKilled(AID killedAgentAID)
     {
-        // The agent won't move anymore (it's dead!)
-        ((GameAgent) myAgent).removeAgentToMove(agentAID);
+        handleAgentMovement(killedAgentAID);
     }
     
     private void handleAgentInitialized()
@@ -117,7 +113,7 @@ public class GameLifecycleBehaviour extends CyclicBehaviour
                 ((GameAgent) myAgent).setGameRunning(false);
                 
                 // Pacman won the game
-                if (null == pacmanKiller)
+                if (pacmanWins)
                 {
                     ((GameAgent) myAgent).getObservers()
                             .forEach(observer -> observer.onGameWonByPacman());
@@ -126,7 +122,7 @@ public class GameLifecycleBehaviour extends CyclicBehaviour
                 else
                 {
                     ((GameAgent) myAgent).getObservers()
-                            .forEach(observer -> observer.onPacmanKilled(pacmanKiller));
+                            .forEach(observer -> observer.onPacmanKilled());
                 }
             }
         }

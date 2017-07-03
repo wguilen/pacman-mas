@@ -7,7 +7,7 @@ public interface GameListener
     void onAgentInitialized();
     void onGameWonByPacman();
     void onLoaded();
-    void onPacmanKilled(String killer);
+    void onPacmanKilled();
     void onTurnComplete();
     
 }

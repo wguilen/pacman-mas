@@ -142,7 +142,12 @@ public class Board
     
     public synchronized void removeAgentCell(Cell agentCell)
     {
-        Cell previousCell = getCell(board, agentCell.getPosition());
+        removeAgentCell(agentCell, false);
+    }
+    
+    public synchronized void removeAgentCell(Cell agentCell, boolean fromCurrentBoard)
+    {
+        Cell previousCell = getCell(fromCurrentBoard ? board : previousBoard, agentCell.getPosition());
         setCell(previousCell);
     }
     

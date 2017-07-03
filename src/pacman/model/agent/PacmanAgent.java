@@ -23,6 +23,7 @@ public class PacmanAgent extends Agent
     private Direction lastDirection;        // Tracks the last direction followed by Pacman (actually, it's currentDirection.getReverse())
     private boolean moving;                 // TRUE if Pacman is moving now - FALSE otherwise
     private int powerupRemainingTurns;      // Tracks the quantity of turns Pacman still is with a powerup
+    private boolean shouldDie;              // TRUE if Pacman was caught by a ghost - FALSE otherwise
     
     @Override
     protected void setup()
@@ -38,6 +39,7 @@ public class PacmanAgent extends Agent
         // Inits the control properties
         gameRunning = false;
         moving = false;
+        shouldDie = false;
         currentDirection = lastDirection = null;
         powerupRemainingTurns = 0;
         
@@ -55,10 +57,28 @@ public class PacmanAgent extends Agent
     @Override
     protected void takeDown()
     {
-        board.removeAgentCell(myCell);
+        board.removeAgentCell(myCell, true);
         System.out.println(getLocalName() + ": Goodbye, cruel world...");
         
         super.takeDown();
+    }
+    
+    
+    // --- Public auxiliary methods
+    
+    public void die()
+    {
+        shouldDie = true;
+        
+        // Notifies GameAgent so the game ends
+        ACLMessage message = new ACLMessage(ACLMessage.INFORM);
+        message.setOntology(GameVocabulary.ONTOLOGY);
+        message.setContent(GameVocabulary.PACMAN_KILLED);
+        message.addReceiver(new AID(Constant.GAME_AGENT_NAME, AID.ISLOCALNAME));
+        send(message);
+        
+        // Effectively dies
+        doDelete();
     }
     
     
@@ -109,6 +129,16 @@ public class PacmanAgent extends Agent
         this.moving = moving;
     }
 
+    public boolean isShouldDie()
+    {
+        return shouldDie;
+    }
+
+    public void setShouldDie(boolean shouldDie)
+    {
+        this.shouldDie = shouldDie;
+    }
+    
     public int getPowerupRemainingTurns()
     {
         return powerupRemainingTurns;

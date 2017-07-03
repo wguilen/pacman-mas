@@ -10,6 +10,7 @@ import pacman.model.board.Direction;
 import pacman.model.board.GhostCell;
 import pacman.model.core.Constant;
 import pacman.model.core.GameVocabulary;
+import pacman.model.core.GhostVocabulary;
 
 public class GhostAgent extends Agent
 {
@@ -25,6 +26,9 @@ public class GhostAgent extends Agent
     private boolean reverseDirection;       // TRUE if ghost receives "GET_OUT_OF_MY_WAY" from another ghost - FALSE otherwise
     private boolean moving;                 // TRUE if the ghost is moving now - FALSE otherwise
     private boolean shouldDie;              // TRUE if the ghost was caught by Pacman - FALSE otherwise
+    
+    
+    // --- Public overriden methods
     
     @Override
     protected void setup()
@@ -64,6 +68,36 @@ public class GhostAgent extends Agent
         
         super.takeDown();
     }
+    
+    
+    // --- Public auxiliary methods
+    
+    public void die()
+    {
+        // Marks the ghost for dying
+        setShouldDie(true);
+        
+        // Notifies other ghosts so they can run
+        ACLMessage message = new ACLMessage(ACLMessage.INFORM);
+        message.setOntology(GhostVocabulary.ONTOLOGY);
+        message.setContent(GhostVocabulary.THE_MOTHERFUCKER_KILLED_ME);
+        board.getGhosts()
+                .stream()
+                .filter(ghost -> !ghost.equals(this))
+                .forEach(ghost -> message.addReceiver(ghost.getAID()));
+        send(message);
+        
+        // Notifies GameAgent I'm dead
+        message.clearAllReceiver();
+        message.setOntology(GameVocabulary.ONTOLOGY);
+        message.setContent(GameVocabulary.GHOST_KILLED);
+        message.addReceiver(new AID(Constant.GAME_AGENT_NAME, AID.ISLOCALNAME));
+        send(message);
+        
+        // Effectively dies
+        doDelete();
+    }
+    
     
     // --- Getters and setters
     
