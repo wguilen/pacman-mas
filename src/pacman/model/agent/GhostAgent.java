@@ -26,6 +26,7 @@ public class GhostAgent extends Agent
     private boolean reverseDirection;       // TRUE if ghost receives "GET_OUT_OF_MY_WAY" from another ghost - FALSE otherwise
     private boolean moving;                 // TRUE if the ghost is moving now - FALSE otherwise
     private boolean shouldDie;              // TRUE if the ghost was caught by Pacman - FALSE otherwise
+    private boolean followingDirection;     // TRUE if the ghost is following a specific direction - FALSE otherwise
     
     
     // --- Public overriden methods
@@ -47,6 +48,7 @@ public class GhostAgent extends Agent
         reverseDirection = false;
         moving = false;
         shouldDie = false;
+        followingDirection = false;
         currentDirection = lastDirection = null;
         
         // Adds its behaviour
@@ -166,6 +168,16 @@ public class GhostAgent extends Agent
         this.moving = moving;
     }
 
+    public boolean isFollowingDirection()
+    {
+        return followingDirection;
+    }
+
+    public void setFollowingDirection(boolean followingDirection)
+    {
+        this.followingDirection = followingDirection;
+    }
+    
     public boolean isShouldDie()
     {
         return shouldDie;

@@ -137,7 +137,7 @@ public class Board
             }
         });
         
-        return pacman.get(0);
+        return !pacman.isEmpty() ? pacman.get(0) : null;
     }
     
     public synchronized void removeAgentCell(Cell agentCell)
