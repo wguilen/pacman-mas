@@ -49,7 +49,7 @@ public class GameLifecycleBehaviour extends CyclicBehaviour
                     break;
                     
                 case GameVocabulary.GHOST_KILLED:
-                    handleDeathConfirmation(message.getSender());
+                    handleGhostKilled(message.getSender());
                     break;
                     
                 case GameVocabulary.MOVED_MY_BODY:
@@ -70,9 +70,9 @@ public class GameLifecycleBehaviour extends CyclicBehaviour
     // --- Private auxiliary methods
     
     // This method is called only when a ghost dies
-    private void handleDeathConfirmation(AID agentAID)
+    private void handleGhostKilled(AID ghostAID)
     {
-        handleAgentMovement(agentAID);
+        handleAgentMovement(ghostAID);
     }
     
     private void handleAgentInitialized()
