@@ -1,6 +1,5 @@
 package pacman.model.behaviour;
 
-import jade.core.AID;
 import jade.core.behaviours.SimpleBehaviour;
 import jade.lang.acl.ACLMessage;
 import pacman.model.agent.GhostAgent;
@@ -11,8 +10,6 @@ import pacman.model.board.CellType;
 import pacman.model.board.Coord2D;
 import pacman.model.board.Direction;
 import pacman.model.board.PacmanCell;
-import pacman.model.core.Constant;
-import pacman.model.core.GameVocabulary;
 import pacman.model.core.GhostVocabulary;
 
 public abstract class BaseMovementBehaviour extends SimpleBehaviour
@@ -91,15 +88,8 @@ public abstract class BaseMovementBehaviour extends SimpleBehaviour
             // Pacman dies
             else
             {
-                // Notifies GameAgent so the game ends
-                ACLMessage message = new ACLMessage(ACLMessage.INFORM);
-                message.setOntology(GameVocabulary.ONTOLOGY);
-                message.setContent(GameVocabulary.END_GHOSTS_WIN);
-                message.addReceiver(new AID(Constant.GAME_AGENT_NAME, AID.ISLOCALNAME));
-                myAgent.send(message);
-
                 // Notifies other ghosts so they can celebrate
-                message.clearAllReceiver();
+                ACLMessage message = new ACLMessage(ACLMessage.INFORM);
                 message.setOntology(GhostVocabulary.ONTOLOGY);
                 message.setContent(GhostVocabulary.THE_MOTHERFUCKER_IS_DEAD);
                 board.getGhosts()
@@ -107,12 +97,9 @@ public abstract class BaseMovementBehaviour extends SimpleBehaviour
                         .filter(ghost -> !ghost.equals(((GhostAgent) myAgent)))
                         .forEach(ghost -> message.addReceiver(ghost.getAID()));
                 myAgent.send(message);
-
-                // Notifies Pacman
-                message.clearAllReceiver();
-                message.setContent(GhostVocabulary.I_KILLED_YOU);
-                message.addReceiver(board.getPacman().getAID());
-                myAgent.send(message);
+                
+                // Kills Pacman
+                pacman.die();
             }
         }
         // Pacman found ghost

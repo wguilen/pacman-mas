@@ -131,9 +131,9 @@ public class GameGui extends JFrame implements GameListener
     }
 
     @Override
-    public void onPacmanKilled(String killer)
+    public void onPacmanKilled()
     {
-        handleQuit("Pacman was killed by " + killer + "!", "End game");
+        handleQuit("Pacman was killed!", "End game");
     }
 
     @Override

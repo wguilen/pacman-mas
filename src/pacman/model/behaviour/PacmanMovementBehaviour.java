@@ -23,10 +23,11 @@ public class PacmanMovementBehaviour extends BaseMovementBehaviour
     @Override
     public void action()
     {
-        // If the game is not running or Pacman still didn't 
-        //      left his house, doesn't move
-        if (!(                                          // If not
-                ((PacmanAgent) myAgent).isGameRunning() // ... game is running
+        // If the game is not running or Pacman is marked
+        //      for death, doesn't move
+        if (!(                                              // If not
+                ((PacmanAgent) myAgent).isGameRunning()     // ... game is running
+                && !((PacmanAgent) myAgent).isShouldDie()   // ... Pacman is not marked for death
            ))
         {
             // Replies to the Game Agent denying this behaviour
