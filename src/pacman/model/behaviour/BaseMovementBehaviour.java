@@ -9,6 +9,7 @@ import pacman.model.board.Cell;
 import pacman.model.board.CellType;
 import pacman.model.board.Coord2D;
 import pacman.model.board.Direction;
+import pacman.model.board.GhostCell;
 import pacman.model.board.PacmanCell;
 import pacman.model.core.GhostVocabulary;
 
@@ -74,18 +75,18 @@ public abstract class BaseMovementBehaviour extends SimpleBehaviour
     
     protected void handlePacmanCollision(Cell cell)
     {
-        // Ghost found Pacman
+        // Ghost found Pacman...
         if (myAgent instanceof GhostAgent 
                 && cell instanceof PacmanCell)
         {
             PacmanAgent pacman = ((PacmanCell) cell).getAgent();
 
-            // Ghost dies
+            // ... and dies
             if (pacman.isPowerfull())
             {
                 ((GhostAgent) myAgent).die();
             }
-            // Pacman dies
+            // ... or kills it
             else
             {
                 // Notifies other ghosts so they can celebrate
@@ -102,12 +103,34 @@ public abstract class BaseMovementBehaviour extends SimpleBehaviour
                 pacman.die();
             }
         }
-        // Pacman found ghost
-        /*else if (myAgent instanceof PacmanAgent 
-                && cell instanceof GhostCell)
+        // Pacman found a ghost...
+        else if (myAgent instanceof PacmanAgent 
+                    && cell instanceof GhostCell)
         {
-            System.out.println("Pacman found a ghoooooooooooooooost!");
-        }*/
+            GhostAgent ghost = ((GhostCell) cell).getAgent();
+            
+            // ... and kills it
+            if (((PacmanAgent) myAgent).isPowerfull())
+            {
+                ghost.die();
+            }
+            // ... or dies
+            else
+            {
+                // Notifies other ghosts so they can celebrate
+                ACLMessage message = new ACLMessage(ACLMessage.INFORM);
+                message.setOntology(GhostVocabulary.ONTOLOGY);
+                message.setContent(GhostVocabulary.THE_MOTHERFUCKER_IS_DEAD);
+                board.getGhosts()
+                        .stream()
+                        .filter(g -> !g.equals(ghost))
+                        .forEach(g -> message.addReceiver(g.getAID()));
+                ghost.send(message);
+                
+                // Suicides
+                ((PacmanAgent) myAgent).die();
+            }
+        }
     }
 
     

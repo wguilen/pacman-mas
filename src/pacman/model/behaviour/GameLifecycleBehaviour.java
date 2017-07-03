@@ -51,7 +51,7 @@ public class GameLifecycleBehaviour extends CyclicBehaviour
                 case GameVocabulary.PACMAN_KILLED:
                     pacmanWins = false;
                     ((GameAgent) myAgent).setGameEnded(true);
-                    //handleAgentKilled(message.getSender());
+                    handleAgentKilled(message.getSender());
                     break;
                     
                 default:

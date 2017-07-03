@@ -184,13 +184,6 @@ public class PacmanMovementBehaviour extends BaseMovementBehaviour
         myAgent.send(message);
     }
     
-    @Override
-    protected boolean isValidDestination(Cell cell)
-    {
-        return super.isValidDestination(cell)       // Cannot run to a door, ghost house or wall
-               && CellType.GHOST != cell.getType(); // Neither to another ghost // TODO: Remove this and treat
-    }
-    
     
     // --- Private auxiliary methods
     
