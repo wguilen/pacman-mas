@@ -345,7 +345,7 @@ public class GhostMovementBehaviour extends BaseMovementBehaviour
         
         Coord2D myPosition = myCell.getPosition();
         Coord2D pacmanPosition = pacman.getBoardCell().getPosition();
-        boolean isFollowingDirection = false;
+        boolean followingDirection = false;
         boolean turnBack = false;
         
         switch (getCurrentDirection())
@@ -353,7 +353,7 @@ public class GhostMovementBehaviour extends BaseMovementBehaviour
             case UP:
                 if (myPosition.y == pacmanPosition.y)
                 {
-                    isFollowingDirection = true;
+                    followingDirection = true;
                     
                     if (myPosition.x < pacmanPosition.x)
                     {
@@ -370,7 +370,7 @@ public class GhostMovementBehaviour extends BaseMovementBehaviour
             case RIGHT:
                 if (myPosition.x == pacmanPosition.x)
                 {
-                    isFollowingDirection = true;
+                    followingDirection = true;
                     
                     if (myPosition.y > pacmanPosition.y)
                     {
@@ -387,7 +387,7 @@ public class GhostMovementBehaviour extends BaseMovementBehaviour
             case DOWN:
                 if (myPosition.y == pacmanPosition.y)
                 {
-                    isFollowingDirection = true;
+                    followingDirection = true;
                     
                     if (myPosition.x > pacmanPosition.x)
                     {
@@ -404,7 +404,7 @@ public class GhostMovementBehaviour extends BaseMovementBehaviour
             case LEFT:
                 if (myPosition.x == pacmanPosition.x)
                 {
-                    isFollowingDirection = true;
+                    followingDirection = true;
                     
                     if (myPosition.y < pacmanPosition.y)
                     {
@@ -419,13 +419,13 @@ public class GhostMovementBehaviour extends BaseMovementBehaviour
                 break;
         }
         
-        if (isFollowingDirection && turnBack)
+        if (followingDirection && turnBack)
         {
             setLastDirection(getCurrentDirection());
             setCurrentDirection(getCurrentDirection().getReverse());
         }
         
-        ((GhostAgent) myAgent).setFollowingDirection(isFollowingDirection);
+        ((GhostAgent) myAgent).setFollowingDirection(followingDirection);
     }
 
     @Override

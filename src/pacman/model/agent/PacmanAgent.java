@@ -24,6 +24,7 @@ public class PacmanAgent extends Agent
     private boolean moving;                 // TRUE if Pacman is moving now - FALSE otherwise
     private int powerupRemainingTurns;      // Tracks the quantity of turns Pacman still is with a powerup
     private boolean shouldDie;              // TRUE if Pacman was caught by a ghost - FALSE otherwise
+    private boolean followingDirection;     // TRUE if Pacman is following a direction - FALSE otherwise
     
     @Override
     protected void setup()
@@ -40,6 +41,7 @@ public class PacmanAgent extends Agent
         gameRunning = false;
         moving = false;
         shouldDie = false;
+        followingDirection = false;
         currentDirection = lastDirection = null;
         powerupRemainingTurns = 0;
         
@@ -129,6 +131,14 @@ public class PacmanAgent extends Agent
         this.moving = moving;
     }
 
+    public boolean isFollowingDirection() {
+        return followingDirection;
+    }
+
+    public void setFollowingDirection(boolean followingDirection) {
+        this.followingDirection = followingDirection;
+    }
+    
     public boolean isShouldDie()
     {
         return shouldDie;
