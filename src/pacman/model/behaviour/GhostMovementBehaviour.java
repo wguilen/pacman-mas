@@ -41,11 +41,16 @@ public class GhostMovementBehaviour extends BaseMovementBehaviour
                 && !((GhostAgent) myAgent).isShouldDie()    // ... the ghost is not marked for death
            ))
         {
+            System.out.println(myAgent.getLocalName() + " cannot move!");
+            
             // Replies to the Game Agent denying this behaviour
-            /*ACLMessage reply = originMessage.createReply();
+            ACLMessage reply = originMessage.createReply();
             reply.setPerformative(ACLMessage.REFUSE);
             reply.setContent(GameVocabulary.MOVED_MY_BODY);
-            myAgent.send(reply);*/
+            myAgent.send(reply);
+            
+            // Updates the GhostAgent state
+            ((GhostAgent) myAgent).setMoving(false);
         
             // Removes this behaviour from the ghost
             myAgent.removeBehaviour(this);

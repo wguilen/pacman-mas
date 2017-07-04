@@ -15,6 +15,8 @@ import pacman.model.core.GameVocabulary;
 public class GameMovementBehaviour extends TickerBehaviour
 {
 
+    private static int ResendTimeout = Constant.RESEND_MOVE_ORDER_TIMEOUT;
+    
     public GameMovementBehaviour(Agent agent)
     {
         super(agent, Constant.MOVEMENT_DELAY);
@@ -23,6 +25,19 @@ public class GameMovementBehaviour extends TickerBehaviour
     @Override
     protected void onTick()
     {
+        if (Constant.DEBUG
+                && !((GameAgent) myAgent).isTurnComplete())
+        {
+            System.out.print("Missing agents to move:");
+            ((GameAgent) myAgent).getAgentsToMove().forEach(agent ->
+            {
+                System.out.print("  " + agent.getLocalName());
+            });
+            System.out.println("");
+        }
+        
+        recycle();
+        
         if (!(((GameAgent) myAgent).isGameRunning()
                 && ((GameAgent) myAgent).isTurnComplete()))
         {
@@ -41,9 +56,38 @@ public class GameMovementBehaviour extends TickerBehaviour
     
     // --- Private auxiliary methods
     
+    private void recycle()
+    {
+        if (!((GameAgent) myAgent).isTurnComplete())
+        {
+            if (Constant.DEBUG)
+            {
+                System.out.println("ResendTimeout is " + ResendTimeout);
+            }
+            
+            if (0 == --ResendTimeout)
+            {
+                System.out.println("Resending move order...");
+                
+                ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
+                message.setOntology(GameVocabulary.ONTOLOGY);
+                message.setContent(GameVocabulary.MOVE_YOUR_BODY);
+        
+                ((GameAgent) myAgent).getAgentsToMove().forEach(agent -> message.addReceiver(agent));
+                myAgent.send(message);
+                
+                ResendTimeout = Constant.RESEND_MOVE_ORDER_TIMEOUT;
+            }
+        }
+    }
+    
     private void sendMoveOrder()
     {
         ((GameAgent) myAgent).setTurnComplete(false);
+        
+        // Clears possible remaining of agents to move
+        // Just a prevention: it should never happen
+        ((GameAgent) myAgent).getAgentsToMove().clear();
         
         ACLMessage message = new ACLMessage(ACLMessage.REQUEST);
         message.setOntology(GameVocabulary.ONTOLOGY);
@@ -81,6 +125,8 @@ public class GameMovementBehaviour extends TickerBehaviour
         {
             ((GameAgent) myAgent).setTurnComplete(true);
         }
+        
+        ResendTimeout = 3;
     }
 
 }
