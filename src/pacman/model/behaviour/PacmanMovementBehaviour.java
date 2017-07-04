@@ -156,7 +156,11 @@ public class PacmanMovementBehaviour extends BaseMovementBehaviour
         handleGameEnd();
         
         // Effectively makes the movement
-        board.moveCell(myCell, myNewPosition, true);
+        if (!((PacmanAgent) myAgent).isShouldDie())
+        {
+            board.moveCell(myCell, myNewPosition, true);
+        }
+        
         moved = true;
         
         // Notifies GameAgent I've made my movement
