@@ -172,11 +172,13 @@ public class GhostMovementBehaviour extends BaseMovementBehaviour
         handlePacmanCollision(nearCell);
             
         // Effectively makes the movement
-        board.moveCell(myCell, myNewPosition);
+        // board.moveCell(myCell, myNewPosition);
         moved = true;
         
         if (!((GhostAgent) myAgent).isShouldDie())
         {
+            board.moveCell(myCell, myNewPosition);
+            
             // Notifies GameAgent I've made my movement
             ACLMessage reply = originMessage.createReply();
             reply.setPerformative(ACLMessage.CONFIRM);

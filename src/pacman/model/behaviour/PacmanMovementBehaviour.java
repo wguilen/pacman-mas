@@ -32,12 +32,17 @@ public class PacmanMovementBehaviour extends BaseMovementBehaviour
                 && !((PacmanAgent) myAgent).isShouldDie()   // ... Pacman is not marked for death
            ))
         {
+            System.out.println(myAgent.getLocalName() + " cannot move!");
+            
             // Replies to the Game Agent denying this behaviour
-            /*ACLMessage reply = originMessage.createReply();
+            ACLMessage reply = originMessage.createReply();
             reply.setPerformative(ACLMessage.REFUSE);
             reply.setContent(GameVocabulary.MOVED_MY_BODY);
-            myAgent.send(reply);*/
+            myAgent.send(reply);
         
+            // Updates the GhostAgent state
+            ((PacmanAgent) myAgent).setMoving(false);
+            
             // Removes this behaviour from Pacman
             myAgent.removeBehaviour(this);
             
