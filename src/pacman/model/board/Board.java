@@ -137,7 +137,7 @@ public class Board
             }
         });
         
-        return pacman.get(0);
+        return !pacman.isEmpty() ? pacman.get(0) : null;
     }
     
     public synchronized void removeAgentCell(Cell agentCell)
@@ -171,10 +171,16 @@ public class Board
     
     public synchronized void moveCell(Cell cell, Coord2D destination, boolean modifyBoard)
     {
+        Cell nextCell = getCell(destination);
+        if (cell instanceof GhostCell && nextCell instanceof GhostCell)
+        {
+            return;
+        }
+        
         // Gets the cell that was on the current position
         Cell previousCell = getCell(previousBoard, cell.getPosition());
         setCell(previousCell);
-        
+
         // If board should be modified...
         if (modifyBoard)
         {
@@ -190,7 +196,7 @@ public class Board
                     break;
             }
         }
-        
+
         // Updates the new cell with its destination
         cell.setPosition(destination);
         setCell(cell);

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import pacman.model.agent.GhostAgent;
+import pacman.model.agent.PacmanAgent;
 import pacman.model.board.Board;
 import pacman.model.board.Cell;
 import pacman.model.board.CellType;
@@ -61,8 +62,9 @@ public class GhostMovementBehaviour extends BaseMovementBehaviour
                 maybeReverseDirection();
             }
 
-            move();                 // Ghost makes a movement
-            checkGhostOnSamePath(); // Ghost checks if are there another ghosts on the same path
+            move();                     // Ghost makes a movement
+            checkGhostOnSamePath();     // Ghost checks if are there another ghosts on the same path
+            checkPacmanOnSamePath();    // Ghost checks if Pacman is in the same path as it
         }
     }
 
@@ -109,31 +111,35 @@ public class GhostMovementBehaviour extends BaseMovementBehaviour
             // Tries to keep following this direction
             else
             {
-                // If a bifurcation was found, decides to follow it or not
-                for (Direction direction : Direction.values())
+                // If the ghost is not following Pacman and a bifurcation was found, 
+                //      decides to follow it or not
+                if (!((GhostAgent) myAgent).isFollowingDirection())
                 {
-                    if (direction.equals(getCurrentDirection())
-                            || direction.equals(getLastDirection())
-                            || direction.equals(Direction.NONE))
+                    for (Direction direction : Direction.values())
                     {
-                        continue;
-                    }
-
-                    myNewPosition = getNewPosition(myPosition, direction);
-                    nearCell = board.getCell(myNewPosition);
-
-                    // Found a valid bifurcation
-                    if (isValidDestination(nearCell))
-                    {
-                        float changeDirection = ThreadLocalRandom.current().nextFloat();
-
-                        // May I follow it?
-                        if (changeDirection <= Constant.GHOST_TURN_ON_BIFURCATION_CHANCE)
+                        if (direction.equals(getCurrentDirection())
+                                || direction.equals(getLastDirection())
+                                || direction.equals(Direction.NONE))
                         {
-                            cellSelected = true;
-                            setCurrentDirection(direction);
-                            setLastDirection(direction.getReverse());
-                            break;
+                            continue;
+                        }
+
+                        myNewPosition = getNewPosition(myPosition, direction);
+                        nearCell = board.getCell(myNewPosition);
+
+                        // Found a valid bifurcation
+                        if (isValidDestination(nearCell))
+                        {
+                            float changeDirection = ThreadLocalRandom.current().nextFloat();
+
+                            // May I follow it?
+                            if (changeDirection <= Constant.GHOST_TURN_ON_BIFURCATION_CHANCE)
+                            {
+                                cellSelected = true;
+                                setCurrentDirection(direction);
+                                setLastDirection(direction.getReverse());
+                                break;
+                            }
                         }
                     }
                 }
@@ -327,6 +333,99 @@ public class GhostMovementBehaviour extends BaseMovementBehaviour
                     break;
             }
         }
+    }
+    
+    private void checkPacmanOnSamePath()
+    {
+        PacmanAgent pacman = board.getPacman();
+        if (null == pacman)
+        {
+            return;
+        }
+        
+        Coord2D myPosition = myCell.getPosition();
+        Coord2D pacmanPosition = pacman.getBoardCell().getPosition();
+        boolean followingDirection = false;
+        boolean turnBack = false;
+        
+        switch (getCurrentDirection())
+        {
+            case UP:
+                if (myPosition.y == pacmanPosition.y)
+                {
+                    followingDirection = true;
+                    
+                    if (myPosition.x < pacmanPosition.x)
+                    {
+                        turnBack = !pacman.isPowerfull();
+                    }
+                    else
+                    {
+                        turnBack = pacman.isPowerfull();
+                    }
+                }
+                
+                break;
+                
+            case RIGHT:
+                if (myPosition.x == pacmanPosition.x)
+                {
+                    followingDirection = true;
+                    
+                    if (myPosition.y > pacmanPosition.y)
+                    {
+                        turnBack = !pacman.isPowerfull();
+                    }
+                    else
+                    {
+                        turnBack = pacman.isPowerfull();
+                    }
+                }
+                
+                break;
+                
+            case DOWN:
+                if (myPosition.y == pacmanPosition.y)
+                {
+                    followingDirection = true;
+                    
+                    if (myPosition.x > pacmanPosition.x)
+                    {
+                        turnBack = !pacman.isPowerfull();
+                    }
+                    else
+                    {
+                        turnBack = pacman.isPowerfull();
+                    }
+                }
+                
+                break;
+                
+            case LEFT:
+                if (myPosition.x == pacmanPosition.x)
+                {
+                    followingDirection = true;
+                    
+                    if (myPosition.y < pacmanPosition.y)
+                    {
+                        turnBack = !pacman.isPowerfull();
+                    }
+                    else
+                    {
+                        turnBack = pacman.isPowerfull();
+                    }
+                }
+                
+                break;
+        }
+        
+        if (followingDirection && turnBack)
+        {
+            setLastDirection(getCurrentDirection());
+            setCurrentDirection(getCurrentDirection().getReverse());
+        }
+        
+        ((GhostAgent) myAgent).setFollowingDirection(followingDirection);
     }
 
     @Override

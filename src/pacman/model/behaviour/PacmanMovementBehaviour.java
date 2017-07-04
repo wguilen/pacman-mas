@@ -2,6 +2,8 @@ package pacman.model.behaviour;
 
 import jade.core.AID;
 import jade.lang.acl.ACLMessage;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import pacman.model.agent.PacmanAgent;
 import pacman.model.board.Board;
@@ -44,7 +46,8 @@ public class PacmanMovementBehaviour extends BaseMovementBehaviour
         
         synchronized(this)
         {
-            move(); // Pacman makes a movement
+            move();                 // Pacman makes a movement
+            checkGhostInSamePath(); // Pacman checks if there is a ghost in the same path as it
         }
     }
 
@@ -91,31 +94,35 @@ public class PacmanMovementBehaviour extends BaseMovementBehaviour
             // Tries to keep following this direction
             else
             {
-                // If a bifurcation was found, decides to follow it or not
-                for (Direction direction : Direction.values())
+                // If Pacman is not following any ghost and bifurcation was found, 
+                //      decides to follow it or not
+                if (!((PacmanAgent) myAgent).isFollowingDirection())
                 {
-                    if (direction.equals(getCurrentDirection())
-                            || direction.equals(getLastDirection())
-                            || direction.equals(Direction.NONE))
+                    for (Direction direction : Direction.values())
                     {
-                        continue;
-                    }
-
-                    myNewPosition = getNewPosition(myPosition, direction);
-                    nearCell = board.getCell(myNewPosition);
-
-                    // Found a valid bifurcation
-                    if (isValidDestination(nearCell))
-                    {
-                        float changeDirection = ThreadLocalRandom.current().nextFloat();
-
-                        // May I follow it?
-                        if (changeDirection <= Constant.PACMAN_TURN_ON_BIFURCATION_CHANCE)
+                        if (direction.equals(getCurrentDirection())
+                                || direction.equals(getLastDirection())
+                                || direction.equals(Direction.NONE))
                         {
-                            cellSelected = true;
-                            setCurrentDirection(direction);
-                            setLastDirection(direction.getReverse());
-                            break;
+                            continue;
+                        }
+
+                        myNewPosition = getNewPosition(myPosition, direction);
+                        nearCell = board.getCell(myNewPosition);
+
+                        // Found a valid bifurcation
+                        if (isValidDestination(nearCell))
+                        {
+                            float changeDirection = ThreadLocalRandom.current().nextFloat();
+
+                            // May I follow it?
+                            if (changeDirection <= Constant.PACMAN_TURN_ON_BIFURCATION_CHANCE)
+                            {
+                                cellSelected = true;
+                                setCurrentDirection(direction);
+                                setLastDirection(direction.getReverse());
+                                break;
+                            }
                         }
                     }
                 }
@@ -162,6 +169,225 @@ public class PacmanMovementBehaviour extends BaseMovementBehaviour
         ((PacmanAgent) myAgent).setMoving(false);
     }
 
+    private void checkGhostInSamePath()
+    {
+        Coord2D myPosition = myCell.getPosition();
+        boolean followingDirection = false;
+        boolean turnBack = false;
+        boolean isPowerful = ((PacmanAgent) myAgent).isPowerfull();
+        
+        // Fetches ghosts current position
+        List<Coord2D> ghostsPositions = new ArrayList<>();
+        board.getGhosts().forEach(ghost -> ghostsPositions.add(ghost.getBoardCell().getPosition()));
+        
+        switch (getCurrentDirection())
+        {
+            case UP:
+                for (Coord2D ghostPosition : ghostsPositions) 
+                {
+                    // Ghost is in the same column as me
+                    if (ghostPosition.y == myPosition.y)
+                    {
+                        followingDirection = true;
+                        
+                        // Ghost is bellow me
+                        if (myPosition.x < ghostPosition.x)
+                        {
+                            turnBack = isPowerful;
+                            
+                            if (turnBack)
+                            {
+                                for (int i = myPosition.x + 1; i < ghostPosition.x; ++i)
+                                {
+                                    Cell cell = board.getCell(new Coord2D(i, myPosition.y));
+                                    if (!isValidDestination(cell))
+                                    {
+                                        followingDirection = false;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        // Ghost is uppon me
+                        else
+                        {
+                            turnBack = !isPowerful;
+                            
+                            if (!turnBack)
+                            {
+                                for (int i = myPosition.x - 1; i > ghostPosition.x; --i)
+                                {
+                                    Cell cell = board.getCell(new Coord2D(i, myPosition.y));
+                                    if (!isValidDestination(cell))
+                                    {
+                                        followingDirection = false;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                break;
+                
+            case RIGHT:
+                for (Coord2D ghostPosition : ghostsPositions) 
+                {
+                    // Ghost is in the same row as me
+                    if (ghostPosition.x == myPosition.x)
+                    {
+                        followingDirection = true;
+                        
+                        // I'm in front of the ghost
+                        if (myPosition.y > ghostPosition.y)
+                        {
+                            turnBack = isPowerful;
+                            
+                            if (turnBack)
+                            {
+                                for (int i = myPosition.y - 1; i > ghostPosition.y; --i)
+                                {
+                                    Cell cell = board.getCell(new Coord2D(myPosition.x, i));
+                                    if (!isValidDestination(cell))
+                                    {
+                                        followingDirection = false;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        // Ghost is at my front
+                        else
+                        {
+                            turnBack = !isPowerful;
+                            
+                            if (!turnBack)
+                            {
+                                for (int i = myPosition.y + 1; i < ghostPosition.y; ++i)
+                                {
+                                    Cell cell = board.getCell(new Coord2D(myPosition.x, i));
+                                    if (!isValidDestination(cell))
+                                    {
+                                        followingDirection = false;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                break;
+                
+            case DOWN:
+                for (Coord2D ghostPosition : ghostsPositions) 
+                {
+                    // Ghost is in the same column as me
+                    if (ghostPosition.y == myPosition.y)
+                    {
+                        followingDirection = true;
+                        
+                        // Ghost is uppon me
+                        if (myPosition.x > ghostPosition.x)
+                        {
+                            turnBack = isPowerful;
+                            
+                            if (turnBack)
+                            {
+                                for (int i = myPosition.x - 1; i > ghostPosition.x; --i)
+                                {
+                                    Cell cell = board.getCell(new Coord2D(i, myPosition.y));
+                                    if (!isValidDestination(cell))
+                                    {
+                                        followingDirection = false;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        // Ghost is bellow me
+                        else
+                        {
+                            turnBack = !isPowerful;
+                            
+                            if (!turnBack)
+                            {
+                                for (int i = myPosition.x + 1; i < ghostPosition.x; ++i)
+                                {
+                                    Cell cell = board.getCell(new Coord2D(i, myPosition.y));
+                                    if (!isValidDestination(cell))
+                                    {
+                                        followingDirection = false;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                break;
+                
+            case LEFT:
+                for (Coord2D ghostPosition : ghostsPositions) 
+                {
+                    // Ghost is in the same row as me
+                    if (ghostPosition.x == myPosition.x)
+                    {
+                        followingDirection = true;
+                        
+                        // Ghost is at my front
+                        if (myPosition.y < ghostPosition.y)
+                        {
+                            turnBack = isPowerful;
+                            
+                            if (turnBack)
+                            {
+                                for (int i = myPosition.y + 1; i < ghostPosition.y; ++i)
+                                {
+                                    Cell cell = board.getCell(new Coord2D(myPosition.x, i));
+                                    if (!isValidDestination(cell))
+                                    {
+                                        followingDirection = false;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        // I'm in front of the ghost
+                        else
+                        {
+                            turnBack = !isPowerful;
+                            
+                            if (!turnBack)
+                            {
+                                for (int i = myPosition.y - 1; i > ghostPosition.y; --i)
+                                {
+                                    Cell cell = board.getCell(new Coord2D(myPosition.x, i));
+                                    if (!isValidDestination(cell))
+                                    {
+                                        followingDirection = false;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                break;
+        }
+        
+        if (followingDirection && turnBack)
+        {
+            setLastDirection(getCurrentDirection());
+            setCurrentDirection(getCurrentDirection().getReverse());
+        }
+        
+        ((PacmanAgent) myAgent).setFollowingDirection(followingDirection);
+    }
+    
     private void handleGameEnd()
     {
         // If the game still has remaining ghosts and collectibles,

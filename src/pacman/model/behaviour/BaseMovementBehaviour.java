@@ -79,6 +79,7 @@ public abstract class BaseMovementBehaviour extends SimpleBehaviour
         if (myAgent instanceof GhostAgent 
                 && cell instanceof PacmanCell)
         {
+            System.out.println("Fantasma colidiu com Pacman!");
             PacmanAgent pacman = ((PacmanCell) cell).getAgent();
 
             // ... and dies
@@ -107,6 +108,7 @@ public abstract class BaseMovementBehaviour extends SimpleBehaviour
         else if (myAgent instanceof PacmanAgent 
                     && cell instanceof GhostCell)
         {
+            System.out.println("Pacman colidiu com fantasma!");
             GhostAgent ghost = ((GhostCell) cell).getAgent();
             
             // ... and kills it
