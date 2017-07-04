@@ -11,4 +11,4 @@ Pacman's implementation as a Multiagent System using [JADE Framework](http://jad
 
 
 ### Version
-Only an alpha version is currently developed. There are no plans on continuing this project as it was used just for validating my knowledges on multiagent systems using [JADE Framework](http://jade.tilab.com/).
+Only an alpha version is currently developed. There are no plans on continuing this project as it was used just for validating my knowledges on multiagent systems using [JADE Framework](http://jade.tilab.com/) for a class on college.
