@@ -45,6 +45,10 @@ public class GhostLifecycleBehaviour extends CyclicBehaviour
                                 ((GhostAgent) myAgent).setMoving(true);
                                 myAgent.addBehaviour(new GhostMovementBehaviour(message, board, myCell));
                             }
+                            else
+                            {
+                                System.out.println(myAgent.getLocalName() + " is already moving...");
+                            }
                             
                             break;
                             
