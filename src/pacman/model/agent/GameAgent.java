@@ -209,8 +209,17 @@ public class GameAgent extends Agent
         {
             agentsToMove.remove(agentAID);
         }
+        /*else
+        {
+            System.out.println("NOT REMOVED " + agentAID);
+        }*/
     }
 
+    public List<AID> getAgentsToMove()
+    {
+        return agentsToMove;
+    }
+    
     public boolean isTurnComplete()
     {
         return turnComplete;
