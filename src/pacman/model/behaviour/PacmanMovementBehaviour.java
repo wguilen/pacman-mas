@@ -174,7 +174,7 @@ public class PacmanMovementBehaviour extends BaseMovementBehaviour
         Coord2D myPosition = myCell.getPosition();
         boolean followingDirection = false;
         boolean turnBack = false;
-        final boolean isPowerful = ((PacmanAgent) myAgent).isPowerfull();
+        boolean isPowerful = ((PacmanAgent) myAgent).isPowerfull();
         
         // Fetches ghosts current position
         List<Coord2D> ghostsPositions = new ArrayList<>();
@@ -185,17 +185,46 @@ public class PacmanMovementBehaviour extends BaseMovementBehaviour
             case UP:
                 for (Coord2D ghostPosition : ghostsPositions) 
                 {
+                    // Ghost is in the same column as me
                     if (ghostPosition.y == myPosition.y)
                     {
                         followingDirection = true;
                         
+                        // Ghost is bellow me
                         if (myPosition.x < ghostPosition.x)
                         {
                             turnBack = isPowerful;
+                            
+                            if (turnBack)
+                            {
+                                for (int i = myPosition.x + 1; i < ghostPosition.x; ++i)
+                                {
+                                    Cell cell = board.getCell(new Coord2D(i, myPosition.y));
+                                    if (!isValidDestination(cell))
+                                    {
+                                        followingDirection = false;
+                                        break;
+                                    }
+                                }
+                            }
                         }
+                        // Ghost is uppon me
                         else
                         {
                             turnBack = !isPowerful;
+                            
+                            if (!turnBack)
+                            {
+                                for (int i = myPosition.x - 1; i > ghostPosition.x; --i)
+                                {
+                                    Cell cell = board.getCell(new Coord2D(i, myPosition.y));
+                                    if (!isValidDestination(cell))
+                                    {
+                                        followingDirection = false;
+                                        break;
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -205,17 +234,46 @@ public class PacmanMovementBehaviour extends BaseMovementBehaviour
             case RIGHT:
                 for (Coord2D ghostPosition : ghostsPositions) 
                 {
+                    // Ghost is in the same row as me
                     if (ghostPosition.x == myPosition.x)
                     {
                         followingDirection = true;
                         
+                        // I'm in front of the ghost
                         if (myPosition.y > ghostPosition.y)
                         {
                             turnBack = isPowerful;
+                            
+                            if (turnBack)
+                            {
+                                for (int i = myPosition.y - 1; i > ghostPosition.y; --i)
+                                {
+                                    Cell cell = board.getCell(new Coord2D(myPosition.x, i));
+                                    if (!isValidDestination(cell))
+                                    {
+                                        followingDirection = false;
+                                        break;
+                                    }
+                                }
+                            }
                         }
+                        // Ghost is at my front
                         else
                         {
                             turnBack = !isPowerful;
+                            
+                            if (!turnBack)
+                            {
+                                for (int i = myPosition.y + 1; i < ghostPosition.y; ++i)
+                                {
+                                    Cell cell = board.getCell(new Coord2D(myPosition.x, i));
+                                    if (!isValidDestination(cell))
+                                    {
+                                        followingDirection = false;
+                                        break;
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -225,17 +283,46 @@ public class PacmanMovementBehaviour extends BaseMovementBehaviour
             case DOWN:
                 for (Coord2D ghostPosition : ghostsPositions) 
                 {
+                    // Ghost is in the same column as me
                     if (ghostPosition.y == myPosition.y)
                     {
                         followingDirection = true;
                         
+                        // Ghost is uppon me
                         if (myPosition.x > ghostPosition.x)
                         {
                             turnBack = isPowerful;
+                            
+                            if (turnBack)
+                            {
+                                for (int i = myPosition.x - 1; i > ghostPosition.x; --i)
+                                {
+                                    Cell cell = board.getCell(new Coord2D(i, myPosition.y));
+                                    if (!isValidDestination(cell))
+                                    {
+                                        followingDirection = false;
+                                        break;
+                                    }
+                                }
+                            }
                         }
+                        // Ghost is bellow me
                         else
                         {
                             turnBack = !isPowerful;
+                            
+                            if (!turnBack)
+                            {
+                                for (int i = myPosition.x + 1; i < ghostPosition.x; ++i)
+                                {
+                                    Cell cell = board.getCell(new Coord2D(i, myPosition.y));
+                                    if (!isValidDestination(cell))
+                                    {
+                                        followingDirection = false;
+                                        break;
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -245,17 +332,46 @@ public class PacmanMovementBehaviour extends BaseMovementBehaviour
             case LEFT:
                 for (Coord2D ghostPosition : ghostsPositions) 
                 {
+                    // Ghost is in the same row as me
                     if (ghostPosition.x == myPosition.x)
                     {
                         followingDirection = true;
                         
+                        // Ghost is at my front
                         if (myPosition.y < ghostPosition.y)
                         {
                             turnBack = isPowerful;
+                            
+                            if (turnBack)
+                            {
+                                for (int i = myPosition.y + 1; i < ghostPosition.y; ++i)
+                                {
+                                    Cell cell = board.getCell(new Coord2D(myPosition.x, i));
+                                    if (!isValidDestination(cell))
+                                    {
+                                        followingDirection = false;
+                                        break;
+                                    }
+                                }
+                            }
                         }
+                        // I'm in front of the ghost
                         else
                         {
                             turnBack = !isPowerful;
+                            
+                            if (!turnBack)
+                            {
+                                for (int i = myPosition.y - 1; i > ghostPosition.y; --i)
+                                {
+                                    Cell cell = board.getCell(new Coord2D(myPosition.x, i));
+                                    if (!isValidDestination(cell))
+                                    {
+                                        followingDirection = false;
+                                        break;
+                                    }
+                                }
+                            }
                         }
                     }
                 }
